@@ -99,3 +99,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# avm (compiled contract)
+*.avm
+
+#debug
+*.debug.json

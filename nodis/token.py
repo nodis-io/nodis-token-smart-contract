@@ -35,6 +35,9 @@ BLOCK_SALE_START = 755000
 # when to end the initial limited round
 LIMITED_ROUND_END = 755000 + 10000
 
+# the initial payout per submission
+START_MINE_RATE = 50
+
 KYC_KEY = b'kyc_ok'
 
 LIMITED_ROUND_KEY = b'r1'
@@ -75,3 +78,9 @@ def get_circulation(ctx):
         int: Total amount in circulation
     """
     return Get(ctx, TOKEN_CIRC_KEY)
+
+
+def get_mine_rate(ctx):
+
+    percent_cir = (get_circulation(ctx) - TOKEN_INITIAL_AMOUNT)/TOKEN_INITIAL_AMOUNT
+    return START_MINE_RATE/percent_cir

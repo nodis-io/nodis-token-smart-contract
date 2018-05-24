@@ -78,6 +78,9 @@ def Main(operation, args):
         elif operation == 'get_attachments':
             return get_asset_attachments()
 
+        elif operation == 'get_mine_rate':
+            return get_mine_rate(ctx)
+
         return 'unknown operation'
 
     return False

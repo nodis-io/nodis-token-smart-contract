@@ -41,7 +41,7 @@ START_MINE_RATE = 50
 KYC_KEY = b'kyc_ok'
 
 LIMITED_ROUND_KEY = b'r1'
-
+    
 
 def crowdsale_available_amount(ctx):
     """
@@ -69,6 +69,12 @@ def add_to_circulation(ctx, amount):
     Put(ctx, TOKEN_CIRC_KEY, current_supply)
     return True
 
+def allocate_to_challenge(ctx, owner, challenge_id, balance):
+    """
+    Allocate Nodis to challenges.
+    """
+    add_to_circulation(ctx, balance)
+    return balance
 
 def get_circulation(ctx):
     """

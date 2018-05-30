@@ -12,12 +12,14 @@ from nodis.txio import get_asset_attachments
 from nodis.token import *
 from nodis.crowdsale import *
 from nodis.nep5 import *
+from nodis.mining import handle_mining
 from boa.interop.Neo.Runtime import GetTrigger, CheckWitness
 from boa.interop.Neo.TriggerType import Application, Verification
 from boa.interop.Neo.Storage import *
 
 ctx = GetContext()
 NEP5_METHODS = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'transferFrom', 'approve', 'allowance']
+MINING_METHODS = ['create_challenge', 'open_challenge', 'close_challenge', 'submit', 'vote']
 
 
 def Main(operation, args):
@@ -55,6 +57,10 @@ def Main(operation, args):
             if operation == op:
                 return handle_nep51(ctx, operation, args)
 
+        for op in MINING_METHODS:
+            if operation == op:
+                return handle_mining(ctx, operation, args)
+        
         if operation == 'deploy':
             return deploy()
 

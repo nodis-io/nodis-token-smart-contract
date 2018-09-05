@@ -12,7 +12,7 @@ TOKEN_DECIMALS = 8
 
 # This is the script hash of the address for the owner of the token
 # This can be found in ``neo-python`` with the walet open, use ``wallet`` command
-TOKEN_OWNER = b'S\xefB\xc8\xdf!^\xbeZ|z\xe8\x01\xcb\xc3\xac/\xacI)'
+TOKEN_OWNER = b'8P\x10\x02\xe0\x00\x92\xc4\xfd\x7f\xea\x99/.\x8f\xe3\xfe\xe0fE'
 
 TOKEN_CIRC_KEY = b'in_circulation'
 
@@ -30,13 +30,13 @@ TOKENS_PER_GAS = 20 * 100000000
 MAX_EXCHANGE_LIMITED_ROUND = 500 * 40 * 100000000
 
 # when to start the crowdsale
-BLOCK_SALE_START = 755000
+BLOCK_SALE_START = 0
 
 # when to end the initial limited round
-LIMITED_ROUND_END = 755000 + 10000
+LIMITED_ROUND_END = 0
 
 # the initial payout per submission
-START_MINE_RATE = 50
+START_MINE_RATE = 50 * 100000000
 
 KYC_KEY = b'kyc_ok'
 
@@ -86,7 +86,42 @@ def get_circulation(ctx):
     return Get(ctx, TOKEN_CIRC_KEY)
 
 
-def get_mine_rate(ctx):
+def get_mining_rate(ctx):
+    """
+    Get the current mining rate.
 
-    percent_cir = (get_circulation(ctx) - TOKEN_INITIAL_AMOUNT)/TOKEN_INITIAL_AMOUNT
-    return START_MINE_RATE/percent_cir
+    :return:
+        int: Current mining rate
+    """
+    circ_growth_rate = (get_circulation(ctx) - TOKEN_INITIAL_AMOUNT)/TOKEN_INITIAL_AMOUNT
+    return START_MINE_RATE * (1 - circ_growth_rate)
+
+def get_promoter_mining_rate(ctx):
+    """
+    Get the current mining rate.
+
+    :return:
+        int: Current mining rate
+    """
+    mining_rate = get_mining_rate(ctx)
+    return mining_rate
+
+def get_rejecter_mining_rate(ctx):
+    """
+    Get the current mining rate.
+
+    :return:
+        int: Current mining rate
+    """
+    mining_rate = get_mining_rate(ctx)
+    return mining_rate
+
+def get_approver_mining_rate(ctx):
+    """
+    Get the current mining rate.
+
+    :return:
+        int: Current mining rate
+    """
+    mining_rate = get_mining_rate(ctx)
+    return mining_rate

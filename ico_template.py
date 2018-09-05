@@ -19,7 +19,7 @@ from boa.interop.Neo.Storage import *
 
 ctx = GetContext()
 NEP5_METHODS = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'transferFrom', 'approve', 'allowance']
-MINING_METHODS = ['create_challenge', 'open_challenge', 'close_challenge', 'submit', 'vote']
+MINING_METHODS = ['register_business', 'check_business', 'signout_business', 'create_challenge', 'close_challenge', 'submit', 'approve', 'reject', 'promoter_claim', 'approver_claim', 'rejecter_claim']
 
 
 def Main(operation, args):
@@ -83,9 +83,6 @@ def Main(operation, args):
 
         elif operation == 'get_attachments':
             return get_asset_attachments()
-
-        elif operation == 'get_mine_rate':
-            return get_mine_rate(ctx)
 
         return 'unknown operation'
 

@@ -1,4 +1,5 @@
 from boa.interop.Neo.Blockchain import GetHeight
+from boa.interop.Neo.Header import GetTimestamp
 from boa.interop.Neo.Runtime import CheckWitness
 from boa.interop.Neo.Action import RegisterAction
 from boa.interop.Neo.Storage import Get, Put

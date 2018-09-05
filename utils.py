@@ -19,3 +19,12 @@ def concat_arrays(arrays):
         for item in array:
             result.append(item)
     return result
+
+def contains(array, element):
+    i = 0
+    while i < len(array):
+        if array[i] == element:
+            result = { element: i }
+            return result
+        i += 1
+    return False

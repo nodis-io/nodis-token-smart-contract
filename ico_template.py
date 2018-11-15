@@ -13,13 +13,13 @@ from nodis.token import *
 from nodis.crowdsale import *
 from nodis.nep5 import *
 from nodis.mining import handle_mining
-from boa.interop.Neo.Runtime import GetTrigger, CheckWitness
+from boa.interop.Neo.Runtime import GetTrigger, CheckWitness, Log, Notify
 from boa.interop.Neo.TriggerType import Application, Verification
 from boa.interop.Neo.Storage import *
 
 ctx = GetContext()
 NEP5_METHODS = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'transferFrom', 'approve', 'allowance']
-MINING_METHODS = ['register_business', 'check_business', 'signout_business', 'create_challenge', 'close_challenge', 'submit', 'approve', 'reject', 'promoter_claim', 'approver_claim', 'rejecter_claim']
+MINING_METHODS = ['register_business', 'check_business', 'signout_business', 'create_challenge', 'close_challenge', 'submit', 'approve_submission', 'reject_submission', 'promoter_claim', 'approver_claim', 'rejecter_claim']
 
 
 def Main(operation, args):
@@ -104,6 +104,7 @@ def deploy():
         # do deploy logic
         Put(ctx, 'initialized', 1)
         Put(ctx, TOKEN_OWNER, TOKEN_INITIAL_AMOUNT)
+        Log("Deployed successfully!")
         return add_to_circulation(ctx, TOKEN_INITIAL_AMOUNT)
 
     return False

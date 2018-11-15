@@ -24,7 +24,9 @@ def contains(array, element):
     i = 0
     while i < len(array):
         if array[i] == element:
-            result = { element: i }
+            result = { 
+                element: i 
+            }
             return result
         i += 1
     return False

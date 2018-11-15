@@ -1,5 +1,5 @@
 from boa.interop.System.ExecutionEngine import GetScriptContainer, GetExecutingScriptHash, GetCallingScriptHash
-from boa.interop.Neo.Runtime import CheckWitness, Notify
+from boa.interop.Neo.Runtime import CheckWitness, Notify, Log
 from boa.interop.Neo.Action import RegisterAction
 from boa.interop.Neo.Storage import *
 from boa.builtins import concat
@@ -8,7 +8,7 @@ from boa.builtins import concat
 from nodis.token import *
 from nodis.nep5 import do_transfer_from
 from nodis.challenge.challenge import create_challenge, submit, close_challenge
-from nodis.submission.submission import create_submission, approve, reject, promoter_fund_claim, rejecter_fund_claim, approver_fund_claim
+from nodis.submission.submission import *
 
 
 OnTransfer = RegisterAction('transfer', 'addr_from', 'addr_to', 'amount')
@@ -34,11 +34,15 @@ def signout(ctx, address):
 
 def handle_mining(ctx, operation, args):
 
+    Log(operation)
+
     if operation == 'register_business':
         address = args[0]
         if CheckWitness(TOKEN_OWNER):
             status = register(ctx, address)
             return status
+        else:
+            return False
 
     if operation == 'check_business':
         address = args[0]
@@ -50,78 +54,146 @@ def handle_mining(ctx, operation, args):
         if CheckWitness(TOKEN_OWNER):
             status = signout(ctx, address)
             return status
+        else:
+            return False
 
     if operation == 'create_challenge':
         owner = args[0]
         challenge_id = args[1]
         if CheckWitness(owner) and check(ctx, owner):
+            Log("Creating challenge.")
             return create_challenge(ctx, owner, challenge_id)
-        return False
+        else:
+            return False
 
     if operation == 'close_challenge':
         owner = args[0]
         challenge_id = args[1]
         if CheckWitness(args[0]) and check(ctx, owner):
             return close_challenge(ctx, owner, challenge_id)
-        return False
+        else:
+            return False
 
     if operation == 'submit':
         if CheckWitness(args[0]):
             challenger = args[0]
             owner = args[1]
             challenge_id = args[2]
+            Log("Creating submission.")
             status = create_submission(ctx, challenger, owner, challenge_id)
             return status
+        else:
+            return False
 
-    if operation == 'approve':
+    if operation == 'approve_submission':
         if CheckWitness(args[0]):
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
-            status = approve(ctx, challenger, owner, challenge_id)
+            Log("Approving submission.")
+            status = approve(ctx, voter, challenger, owner, challenge_id)
             return status
+        else:
+            return False
 
-    if operation == 'reject':
+    if operation == 'reject_submission':
         if CheckWitness(args[0]):
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
-            status = reject(ctx, challenger, owner, challenge_id)
+            Log("Rejecting submission.")
+            status = reject(ctx, voter, challenger, owner, challenge_id)
             return status
+        else:
+            return False
 
     if operation == 'promoter_claim':
         if CheckWitness(args[0]):
+            print("Claiming rewards for promoter.")
             challenger = args[0]
             owner = args[1]
             challenge_id = args[2]
             is_approved = promoter_fund_claim(ctx, challenger, owner, challenge_id)
             if is_approved:
-                fund = get_promoter_mining_rate(ctx)
-                do_transfer_from(ctx, TOKEN_OWNER, owner, fund)
+                print("Promoter is approved for a claim.")
+                amount = get_promoter_mining_rate(ctx)
+                claim_funds(ctx, TOKEN_OWNER, challenger, amount)
                 return True
+            else:
+                print("Promoter is not approved for a claim.")
+                return False   
+        else:
+            return False
 
     if operation == 'approver_claim':
         if CheckWitness(args[0]):
+            print("Claiming rewards for voter.")
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
             has_approved = approver_fund_claim(ctx, voter, challenger, owner, challenge_id)
             if has_approved:
-                fund = get_approver_mining_rate(ctx)
-                do_transfer_from(ctx, TOKEN_OWNER, owner, fund)
+                print("Voter is approved for a claim.")
+                amount = get_approver_mining_rate(ctx)
+                claim_funds(ctx, TOKEN_OWNER, voter, amount)
                 return True
+            else:
+                print("Voter is not approved for a claim.")
+                return False    
+        else:
+            return False
 
     if operation == 'rejecter_claim':
         if CheckWitness(args[0]):
+            print("Claiming rewards for voter.")
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
             has_rejected = rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id)
             if has_rejected:
-                fund = get_rejecter_mining_rate(ctx)
-                do_transfer_from(ctx, TOKEN_OWNER, owner, fund)
+                print("Voter is approved for a claim.")
+                amount = get_rejecter_mining_rate(ctx)
+                claim_funds(ctx, TOKEN_OWNER, voter, amount)
                 return True
+            else:
+                print("Voter is not approved for a claim.")
+                return False 
+        else:
+            return False
+
+    return False
+
+def claim_funds(ctx, t_from, t_to, amount):
+
+    print("Claiming Funds.")
+
+    print(amount)
+
+    if amount <= 0:
+        return False
+
+    from_balance = Get(ctx, t_from)
+
+    if from_balance < amount:
+        print("Insufficient tokens in from balance. Contact Nodis.")
+        return False
+
+    to_balance = Get(ctx, t_to)
+
+    new_from_balance = from_balance - amount
+
+    new_to_balance = to_balance + amount
+
+    Put(ctx, t_to, new_to_balance)
+
+    Put(ctx, t_from, new_from_balance)
+
+    OnTransfer(t_from, t_to, amount)
+
+    print("Funds have been successfully claimed.")
+
+    return True

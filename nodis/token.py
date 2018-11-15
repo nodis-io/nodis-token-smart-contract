@@ -3,6 +3,7 @@ Basic settings for an NEP5 Token and crowdsale
 """
 
 from boa.interop.Neo.Storage import *
+from boa.interop.Neo.Runtime import CheckWitness, Notify, Log
 
 TOKEN_NAME = 'Nodis Token'
 
@@ -12,7 +13,7 @@ TOKEN_DECIMALS = 8
 
 # This is the script hash of the address for the owner of the token
 # This can be found in ``neo-python`` with the walet open, use ``wallet`` command
-TOKEN_OWNER = b'8P\x10\x02\xe0\x00\x92\xc4\xfd\x7f\xea\x99/.\x8f\xe3\xfe\xe0fE'
+TOKEN_OWNER = b'O\x82\x98#Ze\x01\xa9\x9a\x95\xdf\xcf\x83,H\x1d"\xeb{O'
 
 TOKEN_CIRC_KEY = b'in_circulation'
 
@@ -34,9 +35,6 @@ BLOCK_SALE_START = 0
 
 # when to end the initial limited round
 LIMITED_ROUND_END = 0
-
-# the initial payout per submission
-START_MINE_RATE = 50 * 100000000
 
 KYC_KEY = b'kyc_ok'
 
@@ -66,7 +64,9 @@ def add_to_circulation(ctx, amount):
     current_supply = Get(ctx, TOKEN_CIRC_KEY)
 
     current_supply += amount
+
     Put(ctx, TOKEN_CIRC_KEY, current_supply)
+
     return True
 
 def allocate_to_challenge(ctx, owner, challenge_id, balance):
@@ -92,9 +92,8 @@ def get_mining_rate(ctx):
 
     :return:
         int: Current mining rate
-    """
-    circ_growth_rate = (get_circulation(ctx) - TOKEN_INITIAL_AMOUNT)/TOKEN_INITIAL_AMOUNT
-    return START_MINE_RATE * (1 - circ_growth_rate)
+    """    
+    return 50 * 100000000
 
 def get_promoter_mining_rate(ctx):
     """
@@ -103,8 +102,8 @@ def get_promoter_mining_rate(ctx):
     :return:
         int: Current mining rate
     """
-    mining_rate = get_mining_rate(ctx)
-    return mining_rate
+
+    return 25 * 100000000
 
 def get_rejecter_mining_rate(ctx):
     """
@@ -113,8 +112,8 @@ def get_rejecter_mining_rate(ctx):
     :return:
         int: Current mining rate
     """
-    mining_rate = get_mining_rate(ctx)
-    return mining_rate
+
+    return 50000000
 
 def get_approver_mining_rate(ctx):
     """
@@ -123,5 +122,5 @@ def get_approver_mining_rate(ctx):
     :return:
         int: Current mining rate
     """
-    mining_rate = get_mining_rate(ctx)
-    return mining_rate
+
+    return 10000000

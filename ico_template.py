@@ -19,7 +19,7 @@ from boa.interop.Neo.Storage import *
 
 ctx = GetContext()
 NEP5_METHODS = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'transferFrom', 'approve', 'allowance']
-MINING_METHODS = ['register_business', 'check_business', 'signout_business', 'create_challenge', 'close_challenge', 'submit', 'approve_submission', 'reject_submission', 'promoter_claim', 'approver_claim', 'rejecter_claim']
+MINING_METHODS = ['register_business', 'check_business', 'signout_business', 'create_challenge', 'close_challenge', 'submit', 'approve_submission', 'reject_submission', 'promoter_claim', 'approver_claim', 'rejecter_claim', 'get_mining_rate', 'get_promoter_mining_rate', 'get_approver_mining_rate', 'get_rejecter_mining_rate', 'claim_referral_fee', 'check_challenge_package', 'buy_challenge_package']
 
 
 def Main(operation, args):
@@ -103,8 +103,10 @@ def deploy():
     if not Get(ctx, 'initialized'):
         # do deploy logic
         Put(ctx, 'initialized', 1)
-        Put(ctx, TOKEN_OWNER, TOKEN_INITIAL_AMOUNT)
+        Put(ctx, TOKEN_OWNER, TOKEN_OWNER_AMOUNT)
+        Put(ctx, CHALLENGE_SYSTEM_RESERVE, CHALLENGE_SYSTEM_INITIAL_AMOUNT)
+        circulation = TOKEN_OWNER_AMOUNT + CHALLENGE_SYSTEM_INITIAL_AMOUNT
         Log("Deployed successfully!")
-        return add_to_circulation(ctx, TOKEN_INITIAL_AMOUNT)
+        return add_to_circulation(ctx, circulation)
 
     return False

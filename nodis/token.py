@@ -15,11 +15,15 @@ TOKEN_DECIMALS = 8
 # This can be found in ``neo-python`` with the walet open, use ``wallet`` command
 TOKEN_OWNER = b'O\x82\x98#Ze\x01\xa9\x9a\x95\xdf\xcf\x83,H\x1d"\xeb{O'
 
+CHALLENGE_SYSTEM_RESERVE = b'CHALLENGE_SYSTEM_RESERVE'
+
 TOKEN_CIRC_KEY = b'in_circulation'
 
-TOKEN_TOTAL_SUPPLY = 10000000 * 100000000  # 10m total supply * 10^8 ( decimals)
+TOKEN_TOTAL_SUPPLY = 100000000 * 100000000  # 100m total supply * 10^8 ( decimals)
 
-TOKEN_INITIAL_AMOUNT = 2500000 * 100000000  # 2.5m to owners * 10^8
+TOKEN_OWNER_AMOUNT = 40000000 * 100000000  # 40m to owners * 10^8
+
+CHALLENGE_SYSTEM_INITIAL_AMOUNT = 55000000 * 100000000 # 55m to the Challenge System.
 
 # for now assume 1 dollar per token, and one neo = 40 dollars * 10^8
 TOKENS_PER_NEO = 40 * 100000000
@@ -92,20 +96,53 @@ def get_mining_rate(ctx):
 
     :return:
         int: Current mining rate
-    """    
-    return 50 * 100000000
+    """
+    initial_mining_rate = 50 * 100000000
+
+    current_reserve = Get(ctx, CHALLENGE_SYSTEM_RESERVE)
+
+    if current_reserve != 0:
+
+        current_inverse_rate = CHALLENGE_SYSTEM_INITIAL_AMOUNT / current_reserve
+
+        return initial_mining_rate / current_inverse_rate
+
+    else:
+
+        return 0
+
 
 def get_promoter_mining_rate(ctx):
     """
     Get the current mining rate.
 
     :return:
-        int: Current mining rate
+        int: Mining rate for successful promoters (90% of the current mining rate)
     """
 
-    return 25 * 100000000
+    mining_rate = get_mining_rate(ctx)
 
-def get_rejecter_mining_rate(ctx):
+    rate = mining_rate/10
+
+    return rate * 9
+
+def get_rejecter_mining_rate(ctx, number_of_rejecters):
+    """
+    Get the current mining rate for successful rejecters.
+
+    :return:
+        int: Mining rate for successful rejecters (90% of the current mining rate)
+    """
+
+    mining_rate = get_mining_rate(ctx)
+
+    rate = mining_rate/100
+
+    rejecters_reward = 4 * rate
+
+    return rejecters_reward / number_of_rejecters
+
+def get_approver_mining_rate(ctx, number_of_approvers):
     """
     Get the current mining rate.
 
@@ -113,9 +150,15 @@ def get_rejecter_mining_rate(ctx):
         int: Current mining rate
     """
 
-    return 50000000
+    mining_rate = get_mining_rate(ctx)
 
-def get_approver_mining_rate(ctx):
+    rate = mining_rate/100
+
+    approvers_reward = 6 * rate
+
+    return approvers_reward / number_of_approvers
+
+def get_referral_mining_rate(ctx):
     """
     Get the current mining rate.
 
@@ -123,4 +166,10 @@ def get_approver_mining_rate(ctx):
         int: Current mining rate
     """
 
-    return 10000000
+    mining_rate = get_mining_rate(ctx)
+
+    rate = mining_rate/100
+
+    referral_rate = 60 * rate
+
+    return referral_rate

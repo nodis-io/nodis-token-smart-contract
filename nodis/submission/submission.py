@@ -148,7 +148,7 @@ def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
                 submission['rejecters'] = rejecters
                 put(ctx, submission_key, submission)
                 Log("Voter has been removed from the rejecter list. Claim can proceed.")
-                return True
+                return len(rejecters)
             else:
                 Log("Submission was not rejected.") 
                 return False
@@ -176,7 +176,7 @@ def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
                 submission['approvers'] = approvers
                 put(ctx, submission_key, submission)
                 Log("Voter has been removed from the approver list. Claim can proceed.")
-                return True
+                return len(approvers)
             else:
                 Log("Submission was not approved.") 
                 return False

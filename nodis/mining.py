@@ -7,7 +7,7 @@ from boa.builtins import concat
 
 from nodis.token import *
 from nodis.nep5 import do_transfer_from
-from nodis.challenge.challenge import create_challenge, submit, close_challenge
+from nodis.challenge.challenge import create_challenge, submit, close_challenge, check_challenge_package, buy_challenge_package
 from nodis.submission.submission import *
 
 
@@ -54,6 +54,46 @@ def handle_mining(ctx, operation, args):
         if CheckWitness(TOKEN_OWNER):
             status = signout(ctx, address)
             return status
+        else:
+            return False
+
+    if operation == 'get_mining_rate':
+        rate = get_mining_rate(ctx)
+        return rate
+
+    if operation == 'get_promoter_mining_rate':
+        rate = get_promoter_mining_rate(ctx)
+        return rate
+
+    if operation == 'get_approver_mining_rate':
+        rate = get_approver_mining_rate(ctx, args[0])
+        return rate
+
+    if operation == 'get_rejecter_mining_rate':
+        rate = get_rejecter_mining_rate(ctx, args[0])
+        return rate
+
+    if operation == 'claim_referral_reward':
+        business = args[0]
+        buyer = args[1]
+        if CheckWitness(business) and check(ctx, business):
+            amount = get_referral_mining_rate(ctx)
+            claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, buyer, amount)
+
+    if operation == 'check_challenge_package':
+        owner = args[0]
+        if CheckWitness(owner) and check(ctx, owner):
+            Log("Checking challenge package.")
+            return check_challenge_package(ctx, owner)
+        else:
+            return False
+
+    if operation == 'buy_challenge_package':
+        business = args[0]
+        number = args[1]
+        if CheckWitness(TOKEN_OWNER):
+            Log("Adding challenges to the business package.")
+            return buy_challenge_package(ctx, business, number)
         else:
             return False
 
@@ -119,7 +159,7 @@ def handle_mining(ctx, operation, args):
             if is_approved:
                 print("Promoter is approved for a claim.")
                 amount = get_promoter_mining_rate(ctx)
-                claim_funds(ctx, TOKEN_OWNER, challenger, amount)
+                claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, challenger, amount)
                 return True
             else:
                 print("Promoter is not approved for a claim.")
@@ -135,10 +175,10 @@ def handle_mining(ctx, operation, args):
             owner = args[2]
             challenge_id = args[3]
             has_approved = approver_fund_claim(ctx, voter, challenger, owner, challenge_id)
-            if has_approved:
+            if has_approved != False:
                 print("Voter is approved for a claim.")
-                amount = get_approver_mining_rate(ctx)
-                claim_funds(ctx, TOKEN_OWNER, voter, amount)
+                amount = get_approver_mining_rate(ctx, has_approved)
+                claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, voter, amount)
                 return True
             else:
                 print("Voter is not approved for a claim.")
@@ -154,10 +194,10 @@ def handle_mining(ctx, operation, args):
             owner = args[2]
             challenge_id = args[3]
             has_rejected = rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id)
-            if has_rejected:
+            if has_rejected != False:
                 print("Voter is approved for a claim.")
-                amount = get_rejecter_mining_rate(ctx)
-                claim_funds(ctx, TOKEN_OWNER, voter, amount)
+                amount = get_rejecter_mining_rate(ctx, has_rejected)
+                claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, voter, amount)
                 return True
             else:
                 print("Voter is not approved for a claim.")

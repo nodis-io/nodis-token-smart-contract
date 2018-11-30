@@ -73,6 +73,10 @@ def handle_mining(ctx, operation, args):
         rate = get_rejecter_mining_rate(ctx, args[0])
         return rate
 
+    if operation == 'get_referral_mining_rate':
+        rate = get_referral_mining_rate(ctx, args[0])
+        return rate
+
     if operation == 'claim_referral_reward':
         business = args[0]
         buyer = args[1]

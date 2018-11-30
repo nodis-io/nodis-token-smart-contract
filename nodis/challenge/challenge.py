@@ -59,6 +59,7 @@ def create_challenge(ctx, owner, challenge_id):
     last_challenge_date = last_challenge_timestamp(ctx, owner)
     challenge_package = check_challenge_package(ctx, owner)
     using_package = False
+    can_create_challenge = False
 
     if GetTime() > last_challenge_date + 2592000:
         can_create_challenge = True
@@ -68,7 +69,6 @@ def create_challenge(ctx, owner, challenge_id):
         using_package = True
         Log("The business has created a challenge in the past 30 days. Using challenge package.")
     else:
-        can_create_challenge = False
         Log("The last challenger created by the business was less than 30 days ago.")
         Log("The business challenge package is empty.")
         Log("The business cannot create a challenge at the moment.")

@@ -57,6 +57,9 @@ def handle_mining(ctx, operation, args):
         else:
             return False
 
+    if operation == 'challenge_reserve':
+        return Get(ctx, CHALLENGE_SYSTEM_RESERVE)
+
     if operation == 'get_mining_rate':
         rate = get_mining_rate(ctx)
         return rate
@@ -74,7 +77,7 @@ def handle_mining(ctx, operation, args):
         return rate
 
     if operation == 'get_referral_mining_rate':
-        rate = get_referral_mining_rate(ctx, args[0])
+        rate = get_referral_mining_rate(ctx)
         return rate
 
     if operation == 'claim_referral_reward':
@@ -221,6 +224,8 @@ def claim_funds(ctx, t_from, t_to, amount):
         return False
 
     from_balance = Get(ctx, t_from)
+    Log("Challenge Reserve Balance:")
+    Log(from_balance)
 
     if from_balance < amount:
         print("Insufficient tokens in from balance. Contact Nodis.")

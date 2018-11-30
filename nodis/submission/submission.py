@@ -34,7 +34,9 @@ def create_submission(ctx, challenger, owner, challenge_id):
         'voters': [],
         'difference': 0,
         'approvers': [],
+        'approver_count': 0,
         'rejecters': [],
+        'rejecter_count': 0,
         'status': 'SUBMITTED',
         'claimed': 'NO'
     }
@@ -63,9 +65,9 @@ def approve(ctx, voter, challenger, owner, challenge_id):
         approvers.append(voter)
         submission['voters'] = voters
         submission['approvers'] = approvers
-        submission['difference'] = len(submission['approvers']) - len(submission['rejecters'])
-        submit(ctx, submission['challenge_key'], submission_key)
-        if submission['difference'] >= 0 and len(submission['approvers']) > 0:
+        submission['approver_count'] = len(approvers)
+        submission['difference'] = submission['approver_count'] - submission['rejecter_count']
+        if submission['difference'] >= 0 and submission['approver_count'] > 0:
             submission['status'] = 'APPROVED'
         elif submission['difference'] < 0:
             submission['status'] = 'REJECTED'
@@ -91,9 +93,9 @@ def reject(ctx, voter, challenger, owner, challenge_id):
         rejecters.append(voter)
         submission['voters'] = voters
         submission['rejecters'] = rejecters
-        submission['difference'] = len(submission['approvers']) - len(submission['rejecters'])
-        submit(ctx, submission['challenge_key'], submission_key)
-        if submission['difference'] >= 0 and len(submission['approvers']) > 0:
+        submission['rejecter_count'] = len(submission['rejecters'])
+        submission['difference'] = submission['approver_count'] - submission['rejecter_count']
+        if submission['difference'] >= 0 and submission['rejecter_count'] > 0:
             submission['status'] = 'APPROVED'
         elif submission['difference'] < 0:
             submission['status'] = 'REJECTED'
@@ -148,7 +150,7 @@ def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
                 submission['rejecters'] = rejecters
                 put(ctx, submission_key, submission)
                 Log("Voter has been removed from the rejecter list. Claim can proceed.")
-                return len(rejecters)
+                return submission['rejecter_count']
             else:
                 Log("Submission was not rejected.") 
                 return False
@@ -176,7 +178,7 @@ def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
                 submission['approvers'] = approvers
                 put(ctx, submission_key, submission)
                 Log("Voter has been removed from the approver list. Claim can proceed.")
-                return len(approvers)
+                return submission['approver_count']
             else:
                 Log("Submission was not approved.") 
                 return False

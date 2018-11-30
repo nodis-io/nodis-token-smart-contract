@@ -105,3 +105,11 @@ ENV/
 
 #debug
 *.debug.json
+
+alice*
+bob
+business
+clyde
+david
+eunice
+francis

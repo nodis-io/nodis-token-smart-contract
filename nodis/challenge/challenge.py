@@ -71,7 +71,6 @@ def create_challenge(ctx, owner, challenge_id):
     else:
         Log("The last challenger created by the business was less than 30 days ago.")
         Log("The business challenge package is empty.")
-        Log("The business cannot create a challenge at the moment.")
     
     if can_create_challenge:
         if not get_challenge(ctx, challenge_key):
@@ -91,6 +90,9 @@ def create_challenge(ctx, owner, challenge_id):
         else:
             Log("Challenge key already exists.")
             return False
+    else:
+        Log("The business cannot create a challenge at the moment.")
+        return False
 
 
 def submit(ctx, challenge_key, submission_key):

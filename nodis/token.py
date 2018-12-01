@@ -157,10 +157,10 @@ def get_approver_mining_rate(ctx, number_of_approvers):
 
 def get_referral_mining_rate(ctx):
     """
-    Get the current mining rate.
+    Get the mining rate for referrers.
 
     :return:
-        int: Current mining rate
+        int: Mining rate for referrers.
     """
 
     mining_rate = get_mining_rate(ctx)

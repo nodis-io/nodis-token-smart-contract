@@ -50,6 +50,7 @@ def handle_mining(ctx, operation, args):
         return status
 
     if operation == 'signout_business':
+        # Not tested signout - Very Important
         address = args[0]
         if CheckWitness(TOKEN_OWNER):
             status = signout(ctx, address)

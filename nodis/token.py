@@ -48,6 +48,7 @@ LIMITED_ROUND_KEY = b'r1'
 
 def crowdsale_available_amount(ctx):
     """
+    Return the amount of tokens available to the crowdsale.
 
     :return: int The amount of tokens left for sale in the crowdsale
     """

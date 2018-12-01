@@ -46,7 +46,7 @@ def create_submission(ctx, challenger, owner, challenge_id):
         put(ctx, submission_key, submission)
         return submission_key
     else:
-        Log("Submission was not saved.")
+        Log("Submission was not stored.")
         return False
 
 def approve(ctx, voter, challenger, owner, challenge_id):

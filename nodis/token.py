@@ -15,6 +15,7 @@ TOKEN_DECIMALS = 8
 # This can be found in ``neo-python`` with the walet open, use ``wallet`` command
 TOKEN_OWNER = b'\x9e\x9a\\\xfd\xb5\x18\xb83\x89e\xf4\x94\xb2\x15u\x0eh\xc2,\xa7'
 
+# Address of the challenge reserve
 CHALLENGE_SYSTEM_RESERVE = b'CHALLENGE_SYSTEM_RESERVE'
 
 TOKEN_CIRC_KEY = b'in_circulation'
@@ -92,7 +93,9 @@ def get_circulation(ctx):
 
 def get_mining_rate(ctx):
     """
-    Get the current mining rate.
+    Get the current mining rate. The mining rate is 50 Nodis upon deployment. The mining rate can be calculated by the following formula:
+
+    mining rate = initial mining rate * (current challenge reserve / initial challenge reserve)
 
     :return:
         int: Current mining rate
@@ -114,7 +117,7 @@ def get_mining_rate(ctx):
 
 def get_promoter_mining_rate(ctx):
     """
-    Get the current mining rate.
+    Get the mining rate for successful promoters. A promoter gets 80% of the mining rate.
 
     :return:
         int: Mining rate for successful promoters (90% of the current mining rate)
@@ -128,10 +131,10 @@ def get_promoter_mining_rate(ctx):
 
 def get_rejecter_mining_rate(ctx, number_of_rejecters):
     """
-    Get the current mining rate for successful rejecters.
+    Get the mining rate for successful rejecters. Successful rejecters share 8% of the mining rate.
 
     :return:
-        int: Mining rate for successful rejecters (90% of the current mining rate)
+        int: The mining rate for successful rejecters divided by the number of rejecters.
     """
 
     mining_rate = get_mining_rate(ctx)
@@ -144,10 +147,10 @@ def get_rejecter_mining_rate(ctx, number_of_rejecters):
 
 def get_approver_mining_rate(ctx, number_of_approvers):
     """
-    Get the current mining rate.
+    Get the mining rate for successful approvers. Successful approvers share 12% of the mining rate.
 
     :return:
-        int: Current mining rate
+        int: The mining rate for successful approvers divided by the number of approvers. 
     """
 
     mining_rate = get_mining_rate(ctx)

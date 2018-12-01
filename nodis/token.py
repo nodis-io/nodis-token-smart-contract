@@ -24,7 +24,7 @@ TOKEN_TOTAL_SUPPLY = 100000000 * 100000000  # 100m total supply * 10^8 ( decimal
 
 TOKEN_OWNER_AMOUNT = 40000000 * 100000000  # 40m to owners * 10^8
 
-CHALLENGE_SYSTEM_INITIAL_AMOUNT = 55000000 * 100000000 # 55m to the Challenge System.
+CHALLENGE_SYSTEM_INITIAL_AMOUNT = 55000000 * 100000000 # 55m to the Challenge Reserve.
 
 # for now assume 1 dollar per token, and one neo = 40 dollars * 10^8
 TOKENS_PER_NEO = 40 * 100000000

@@ -95,6 +95,8 @@ def get_mining_rate(ctx):
     :return:
         int: Current mining rate
     """
+    # Needs to be tested more thoroughly especially when the supply increases.
+
     initial_mining_rate = 50 * 100000000
 
     current_reserve = Get(ctx, CHALLENGE_SYSTEM_RESERVE)

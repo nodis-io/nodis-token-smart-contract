@@ -74,12 +74,6 @@ def add_to_circulation(ctx, amount):
 
     return True
 
-def allocate_to_challenge(ctx, owner, challenge_id, balance):
-    """
-    Allocate Nodis to challenges.
-    """
-    add_to_circulation(ctx, balance)
-    return balance
 
 def get_circulation(ctx):
     """

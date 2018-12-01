@@ -13,7 +13,7 @@ TOKEN_DECIMALS = 8
 
 # This is the script hash of the address for the owner of the token
 # This can be found in ``neo-python`` with the walet open, use ``wallet`` command
-TOKEN_OWNER = b'O\x82\x98#Ze\x01\xa9\x9a\x95\xdf\xcf\x83,H\x1d"\xeb{O'
+TOKEN_OWNER = b'\x9e\x9a\\\xfd\xb5\x18\xb83\x89e\xf4\x94\xb2\x15u\x0eh\xc2,\xa7'
 
 CHALLENGE_SYSTEM_RESERVE = b'CHALLENGE_SYSTEM_RESERVE'
 
@@ -124,7 +124,7 @@ def get_promoter_mining_rate(ctx):
 
     rate = mining_rate/10
 
-    return rate * 9
+    return rate * 80
 
 def get_rejecter_mining_rate(ctx, number_of_rejecters):
     """
@@ -138,7 +138,7 @@ def get_rejecter_mining_rate(ctx, number_of_rejecters):
 
     rate = mining_rate/100
 
-    rejecters_reward = 4 * rate
+    rejecters_reward = 8 * rate
 
     return rejecters_reward / number_of_rejecters
 
@@ -154,7 +154,7 @@ def get_approver_mining_rate(ctx, number_of_approvers):
 
     rate = mining_rate/100
 
-    approvers_reward = 6 * rate
+    approvers_reward = 12 * rate
 
     return approvers_reward / number_of_approvers
 

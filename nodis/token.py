@@ -61,7 +61,7 @@ def crowdsale_available_amount(ctx):
 
 def add_to_circulation(ctx, amount):
     """
-    Adds an amount of token to circlulation
+    Adds an amount of token to circulation
 
     :param amount: int the amount to add to circulation
     """

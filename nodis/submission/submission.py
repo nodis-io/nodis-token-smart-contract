@@ -67,9 +67,9 @@ def approve(ctx, voter, challenger, owner, challenge_id):
         submission['approvers'] = approvers
         submission['approver_count'] = len(approvers)
         submission['difference'] = submission['approver_count'] - submission['rejecter_count']
-        if submission['difference'] >= 0 and submission['approver_count'] > 0:
+        if submission['difference'] > 0:
             submission['status'] = 'APPROVED'
-        elif submission['difference'] < 0:
+        elif submission['difference'] <= 0:
             submission['status'] = 'REJECTED'
         put(ctx, submission_key, submission)
         return True
@@ -95,9 +95,9 @@ def reject(ctx, voter, challenger, owner, challenge_id):
         submission['rejecters'] = rejecters
         submission['rejecter_count'] = len(submission['rejecters'])
         submission['difference'] = submission['approver_count'] - submission['rejecter_count']
-        if submission['difference'] >= 0 and submission['rejecter_count'] > 0:
+        if submission['difference'] > 0:
             submission['status'] = 'APPROVED'
-        elif submission['difference'] < 0:
+        elif submission['difference'] <= 0:
             submission['status'] = 'REJECTED'
         put(ctx, submission_key, submission)
         return True

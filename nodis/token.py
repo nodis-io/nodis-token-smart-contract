@@ -120,7 +120,7 @@ def get_promoter_mining_rate(ctx):
     Get the mining rate for successful promoters. A promoter gets 80% of the mining rate.
 
     :return:
-        int: Mining rate for successful promoters (90% of the current mining rate)
+        int: Mining rate for successful promoters.
     """
 
     mining_rate = get_mining_rate(ctx)

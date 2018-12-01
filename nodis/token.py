@@ -12,7 +12,6 @@ TOKEN_SYMBOL = 'NODIS'
 TOKEN_DECIMALS = 8
 
 # This is the script hash of the address for the owner of the token
-# This can be found in ``neo-python`` with the walet open, use ``wallet`` command
 TOKEN_OWNER = b'\x9e\x9a\\\xfd\xb5\x18\xb83\x89e\xf4\x94\xb2\x15u\x0eh\xc2,\xa7'
 
 # Address of the challenge reserve

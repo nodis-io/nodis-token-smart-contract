@@ -244,6 +244,8 @@ def claim_funds(ctx, t_from, t_to, amount):
 
     OnTransfer(t_from, t_to, amount)
 
+    # Maybe add to circulation here as opposed to on deployment?
+
     print("Funds have been successfully claimed.")
 
     return True

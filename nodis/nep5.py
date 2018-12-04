@@ -55,6 +55,9 @@ def do_transfer(ctx, t_from, t_to, amount):
     if len(t_to) != 20:
         return False
 
+    if t_from == CHALLENGE_SYSTEM_RESERVE:
+        return False
+
     if CheckWitness(t_from):
 
         if t_to == CHALLENGE_SYSTEM_RESERVE and t_from != TOKEN_OWNER:

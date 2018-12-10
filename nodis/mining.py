@@ -29,7 +29,7 @@ def check(ctx, address):
 
 def signout(ctx, address):
     key = generate_business_key(address)
-    Delete(ctx, address)
+    Delete(ctx, key)
     return True
 
 def handle_mining(ctx, operation, args):

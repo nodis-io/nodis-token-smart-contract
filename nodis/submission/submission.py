@@ -1,5 +1,5 @@
 from boa.interop.Neo.Storage import *
-from boa.interop.Neo.Runtime import Notify, Serialize, Deserialize, Log
+from boa.interop.Neo.Runtime import Notify, Serialize, Deserialize, Log, GetTime
 from utils import concat_bytes, contains
 from nodis.challenge.challenge import submit, get_challenge, is_closed, generate_challenge_key
 
@@ -38,6 +38,8 @@ def create_submission(ctx, challenger, owner, challenge_id):
         'rejecters': [],
         'rejecter_count': 0,
         'status': 'SUBMITTED',
+        'state': 'CLOSED',
+        'timestamp': GetTime(),
         'claimed': 'NO'
     }
     status = submit(ctx, challenge_key, submission_key)
@@ -54,27 +56,33 @@ def approve(ctx, voter, challenger, owner, challenge_id):
     Log("Generating submission key.")
     Log(submission_key)
     submission = get_submission(ctx, submission_key)
-    voters = submission['voters']
-    voted = contains(voters, voter)
-    Log("Checking that the user has not already voted for this submission.")
-    Log(voted)
-    if voted == False:
-        Log("Approving submission.")
-        approvers = submission['approvers']
-        voters.append(voter)
-        approvers.append(voter)
-        submission['voters'] = voters
-        submission['approvers'] = approvers
-        submission['approver_count'] = len(approvers)
-        submission['difference'] = submission['approver_count'] - submission['rejecter_count']
-        if submission['difference'] >= 0:
-            submission['status'] = 'APPROVED'
-        elif submission['difference'] < 0:
-            submission['status'] = 'REJECTED'
-        put(ctx, submission_key, submission)
-        return True
+    if GetTime() < submission['timestamp'] + 86400:
+        voters = submission['voters']
+        voted = contains(voters, voter)
+        Log("Checking that the user has not already voted for this submission.")
+        Log(voted)
+        if voted == False:
+            Log("Approving submission.")
+            approvers = submission['approvers']
+            voters.append(voter)
+            approvers.append(voter)
+            submission['voters'] = voters
+            submission['approvers'] = approvers
+            submission['approver_count'] = len(approvers)
+            submission['difference'] = submission['approver_count'] - submission['rejecter_count']
+            if submission['difference'] >= 0:
+                submission['status'] = 'APPROVED'
+            elif submission['difference'] < 0:
+                submission['status'] = 'REJECTED'
+            put(ctx, submission_key, submission)
+            return True
+        else:
+            Log("The user already voted.")
+            return False
     else:
-        Log("The user already voted.")
+        Log("This submission has expired.")
+        submission['state'] = 'CLOSED'
+        put(ctx, submission_key, submission)
         return False
 
 def reject(ctx, voter, challenger, owner, challenge_id):
@@ -82,27 +90,33 @@ def reject(ctx, voter, challenger, owner, challenge_id):
     Log("Generating submission key.")
     Log(submission_key)
     submission = get_submission(ctx, submission_key)
-    voters = submission['voters']
-    voted = contains(voters, voter)
-    Log("Checking that the user has not already voted for this submission.")
-    Log(voted)
-    if voted == False:
-        Log("Rejecting submission.")
-        rejecters = submission['rejecters']
-        voters.append(voter)
-        rejecters.append(voter)
-        submission['voters'] = voters
-        submission['rejecters'] = rejecters
-        submission['rejecter_count'] = len(submission['rejecters'])
-        submission['difference'] = submission['approver_count'] - submission['rejecter_count']
-        if submission['difference'] >= 0:
-            submission['status'] = 'APPROVED'
-        elif submission['difference'] < 0:
-            submission['status'] = 'REJECTED'
-        put(ctx, submission_key, submission)
-        return True
+    if GetTime() < submission['timestamp'] + 86400:
+        voters = submission['voters']
+        voted = contains(voters, voter)
+        Log("Checking that the user has not already voted for this submission.")
+        Log(voted)
+        if voted == False:
+            Log("Rejecting submission.")
+            rejecters = submission['rejecters']
+            voters.append(voter)
+            rejecters.append(voter)
+            submission['voters'] = voters
+            submission['rejecters'] = rejecters
+            submission['rejecter_count'] = len(submission['rejecters'])
+            submission['difference'] = submission['approver_count'] - submission['rejecter_count']
+            if submission['difference'] >= 0:
+                submission['status'] = 'APPROVED'
+            elif submission['difference'] < 0:
+                submission['status'] = 'REJECTED'
+            put(ctx, submission_key, submission)
+            return True
+        else:
+            Log("The user already voted.")
+            return False
     else:
-        Log("The user already voted.")
+        Log("This submission has expired.")
+        submission['state'] = 'CLOSED'
+        put(ctx, submission_key, submission)
         return False
 
 
@@ -111,11 +125,9 @@ def promoter_fund_claim(ctx, challenger, owner, challenge_id):
     Log("Generating submission key.")
     Log(submission_key)
     submission = get_submission(ctx, submission_key)
-    challenge_key = generate_challenge_key(owner, challenge_id)
-    Log("Generating challenge key.")
-    Log(challenge_key)
-    if is_closed(ctx, challenge_key):
-        Log("Challenge is closed.")
+    if GetTime() >= submission['timestamp'] + 86400:
+        Log("Submission is closed.")
+        submission['state'] = 'CLOSED'
         if submission['status'] == 'APPROVED':
             Log("Submission has been approved. Eligible for claim.") 
             if submission['claimed'] == 'NO':
@@ -130,7 +142,7 @@ def promoter_fund_claim(ctx, challenger, owner, challenge_id):
             Log("Submission has been rejected. Not eligible for claim.") 
             return False
     else:
-        Log("Challenge is still open.")
+        Log("Submission is still open.")
         return False
 
 def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
@@ -138,10 +150,10 @@ def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
     Log("Generating submission key.")
     Log(submission_key)
     submission = get_submission(ctx, submission_key)
-    rejecters = submission['rejecters']
-    rejecter = contains(rejecters, voter)
-    if is_closed(ctx, submission['challenge_key']):
-        Log("Challenge is closed.")
+    if GetTime() >= submission['timestamp'] + 86400:
+        Log("Submission is closed.")
+        rejecters = submission['rejecters']
+        rejecter = contains(rejecters, voter)
         if rejecter != False:
             Log("Voter rejected the submission.") 
             if submission['status'] == 'REJECTED':
@@ -158,7 +170,7 @@ def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
             Log("Voter is not in the rejecter list.") 
             return False
     else:
-        Log("Challenge is still open.")
+        Log("Submission is still open.")
         return False
 
 def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
@@ -166,10 +178,10 @@ def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
     Log("Generating submission key.")
     Log(submission_key)
     submission = get_submission(ctx, submission_key)
-    approvers = submission['approvers']
-    approver = contains(approvers, voter)
-    if is_closed(ctx, submission['challenge_key']):
-        Log("Challenge is closed.")
+    if GetTime() >= submission['timestamp'] + 86400:
+        Log("Submission is closed.")
+        approvers = submission['approvers']
+        approver = contains(approvers, voter)
         if approver != False:
             Log("Voter approved the submission.")  
             if submission['status'] == 'APPROVED':
@@ -186,5 +198,5 @@ def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
             Log("Voter is not in the approver list.")
             return False
     else:
-        Log("Challenge is still open.")
+        Log("Submission is still open.")
         return False

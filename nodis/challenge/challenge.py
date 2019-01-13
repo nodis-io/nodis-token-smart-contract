@@ -108,7 +108,7 @@ def submit(ctx, challenge_key, submission_key):
             challenge['submissions'] = submissions
             put(ctx, challenge_key, challenge)
             return True
-        elif GetTime() > challenge['timestamp'] + 86400:
+        elif GetTime() > challenge['timestamp'] + 1209600:
             Log("This challenge has expired.")
             challenge['state'] = 'CLOSED'
             put(ctx, challenge_key, challenge)

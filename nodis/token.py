@@ -21,7 +21,7 @@ TOKEN_CIRC_KEY = b'in_circulation'
 
 TOKEN_TOTAL_SUPPLY = 100000000 * 100000000  # 100m total supply * 10^8 ( decimals)
 
-TOKEN_OWNER_AMOUNT = 40000000 * 100000000  # 40m to owners * 10^8
+TOKEN_OWNER_AMOUNT = 20200000 * 100000000  # 20.2m to owners * 10^8
 
 CHALLENGE_SYSTEM_INITIAL_AMOUNT = 55000000 * 100000000 # 55m to the Challenge Reserve.
 
@@ -34,15 +34,24 @@ TOKENS_PER_GAS = 20 * 100000000
 # maximum amount you can mint in the limited round ( 500 neo/person * 40 Tokens/NEO * 10^8 )
 MAX_EXCHANGE_LIMITED_ROUND = 500 * 40 * 100000000
 
+# maximum amount available to during Series A
+SERIES_B_TOTAL_AMOUNT = 15800000 * 100000000
+
 # when to start the crowdsale
 BLOCK_SALE_START = 0
 
 # when to end the initial limited round
 LIMITED_ROUND_END = 0
 
+# Series A Token Sale Start
+SERIES_A_START = 0
+
+# Series B Token Sale Start
+SERIES_B_START = 0
+
 KYC_KEY = b'kyc_ok'
 
-LIMITED_ROUND_KEY = b'r1'
+SERIES_A_KEY = b'r1'
     
 
 def crowdsale_available_amount(ctx):
@@ -156,19 +165,3 @@ def get_approver_mining_rate(ctx, number_of_approvers):
     approvers_reward = 12 * rate
 
     return approvers_reward / number_of_approvers
-
-def get_referral_mining_rate(ctx):
-    """
-    Get the mining rate for referrers.
-
-    :return:
-        int: Mining rate for referrers.
-    """
-
-    mining_rate = get_mining_rate(ctx)
-
-    rate = mining_rate/100
-
-    referral_rate = 60 * rate
-
-    return referral_rate

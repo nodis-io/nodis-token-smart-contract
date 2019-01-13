@@ -8,7 +8,7 @@ from boa.builtins import concat
 from nodis.token import *
 from nodis.nep5 import do_transfer_from
 from nodis.challenge.challenge import create_challenge, submit, close_challenge, check_challenge_package, buy_challenge_package
-from nodis.submission.submission import *
+from nodis.submission.submission import create_submission, approve, reject, promoter_fund_claim, rejecter_fund_claim
 
 
 OnTransfer = RegisterAction('transfer', 'addr_from', 'addr_to', 'amount')

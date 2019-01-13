@@ -1,6 +1,6 @@
 from boa.interop.Neo.Blockchain import GetHeight
 from boa.interop.Neo.Header import GetTimestamp
-from boa.interop.Neo.Runtime import CheckWitness
+from boa.interop.Neo.Runtime import CheckWitness, GetTime
 from boa.interop.Neo.Action import RegisterAction
 from boa.interop.Neo.Storage import Get, Put
 from boa.builtins import concat
@@ -170,7 +170,7 @@ def calculate_can_exchange(ctx, amount, address, verify_only):
     :return:
         bool: Whether or not an address can exchange a specified amount
     """
-    height = GetHeight()
+    time = GetTime()
 
     current_in_circulation = Get(ctx, TOKEN_CIRC_KEY)
 
@@ -179,21 +179,23 @@ def calculate_can_exchange(ctx, amount, address, verify_only):
     if new_amount > TOKEN_TOTAL_SUPPLY:
         return False
 
-    if height < BLOCK_SALE_START:
+    if time < BLOCK_SALE_START:
         return False
 
     # if we are in free round, any amount
-    if height > LIMITED_ROUND_END:
+    if time > SERIES_B_START:
         return True
 
-    # check amount in limited round
-    if amount <= MAX_EXCHANGE_LIMITED_ROUND:
+    # check amount in Series A
+    amount_available = crowdsale_available_amount(ctx)
 
-        # check if they have already exchanged in the limited round
-        r1key = concat(address, LIMITED_ROUND_KEY)
+    if amount_available > SERIES_B_TOTAL_AMOUNT:
+
+        # check if they have already exchanged in the Series A
+        r1key = concat(address, SERIES_A_KEY)
         has_exchanged = Get(ctx, r1key)
 
-        # if not, then save the exchange for limited round
+        # if not, then save the exchange for Series A
         if not has_exchanged:
             # note that this method can be invoked during the Verification trigger, so we have the
             # verify_only param to avoid the Storage.Put during the read-only Verification trigger.

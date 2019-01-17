@@ -50,7 +50,6 @@ def handle_mining(ctx, operation, args):
         return status
 
     if operation == 'signout_business':
-        # Not tested signout - Very Important
         address = args[0]
         if CheckWitness(TOKEN_OWNER):
             status = signout(ctx, address)
@@ -80,13 +79,6 @@ def handle_mining(ctx, operation, args):
     if operation == 'get_referral_mining_rate':
         rate = get_referral_mining_rate(ctx)
         return rate
-
-    if operation == 'claim_referral_reward':
-        business = args[0]
-        buyer = args[1]
-        if CheckWitness(business) and check(ctx, business):
-            amount = get_referral_mining_rate(ctx)
-            claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, buyer, amount)
 
     if operation == 'check_challenge_package':
         owner = args[0]
@@ -216,36 +208,21 @@ def handle_mining(ctx, operation, args):
     return False
 
 def claim_funds(ctx, t_from, t_to, amount):
-
     print("Claiming Funds.")
-
     print(amount)
-
     if amount <= 0:
         return False
-
     from_balance = Get(ctx, t_from)
     Log("Challenge Reserve Balance:")
     Log(from_balance)
-
     if from_balance < amount:
         print("Insufficient tokens in from balance. Contact Nodis.")
         return False
-
     to_balance = Get(ctx, t_to)
-
     new_from_balance = from_balance - amount
-
     new_to_balance = to_balance + amount
-
     Put(ctx, t_to, new_to_balance)
-
     Put(ctx, t_from, new_from_balance)
-
     OnTransfer(t_from, t_to, amount)
-
-    # Maybe add to circulation here as opposed to on deployment?
-
     print("Funds have been successfully claimed.")
-
     return True

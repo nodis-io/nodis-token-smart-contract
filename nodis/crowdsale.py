@@ -75,21 +75,24 @@ def perform_exchange(ctx):
         # block before the total amount is reached.  An amount of TX will get through
         # the verification phase because the total amount cannot be updated during that phase
         # because of this, there should be a process in place to manually refund tokens
-        if attachments[2] > 0:
-            OnRefund(attachments[1], attachments[2])
-        # if you want to exchange gas instead of neo, use this
-        # if attachments.gas_attached > 0:
-        #    OnRefund(attachments.sender_addr, attachments.gas_attached)
+        if attachments.gas_attached > 0:
+            OnRefund(attachments.sender_addr, attachments.gas_attached)
         return False
 
     # lookup the current balance of the address
     current_balance = Get(ctx, attachments[1])
 
-    # calculate the amount of tokens the attached neo will earn
-    exchanged_tokens = attachments[2] * TOKENS_PER_NEO / 100000000
+    time = GetTime()
 
-    # if you want to exchange gas instead of neo, use this
-    # exchanged_tokens += attachments[3] * TOKENS_PER_GAS / 100000000
+    # Sending back 9
+    if time > SERIES_A_START and time < SERIES_A_END:
+        exchanged_tokens += attachments[3] * TOKENS_PER_GAS_SERIES_A / 100000000
+
+    elif time > SERIES_B_START and time < SERIES_B_END:
+        exchanged_tokens += attachments[3] * TOKENS_PER_GAS_SERIES_B / 100000000
+
+    else:
+        return False
 
     # add it to the the exchanged tokens and persist in storage
     new_total = exchanged_tokens + current_balance
@@ -119,13 +122,8 @@ def can_exchange(ctx, attachments, verify_only):
     """
 
     # if you are accepting gas, use this
-#        if attachments[3] == 0:
-#            print("no gas attached")
-#            return False
-
-    # if youre accepting neo, use this
-
-    if attachments[2] == 0:
+    if attachments[3] < 50:
+        print("Not enough gas attached!")
         return False
 
     # the following looks up whether an address has been
@@ -136,11 +134,9 @@ def can_exchange(ctx, attachments, verify_only):
     if not get_kyc_status(ctx, attachments[1]):
         return False
 
-    # caluclate the amount requested
-    amount_requested = attachments[2] * TOKENS_PER_NEO / 100000000
-
+    # calculate the amount requested
     # this would work for accepting gas
-    # amount_requested = attachments.gas_attached * token.tokens_per_gas / 100000000
+    amount_requested = attachments.gas_attached * token.tokens_per_gas / 100000000
 
     exchange_ok = calculate_can_exchange(ctx, amount_requested, attachments[1], verify_only)
 
@@ -179,24 +175,18 @@ def calculate_can_exchange(ctx, amount, address, verify_only):
     if new_amount > TOKEN_TOTAL_SUPPLY:
         return False
 
-    if time < BLOCK_SALE_START:
+    if time < SERIES_A_START:
         return False
 
-    # if we are in free round, any amount
-    if time > SERIES_B_START:
-        return True
+    if time > SERIES_B_END:
+        return False
 
     # check amount in Series A
     amount_available = crowdsale_available_amount(ctx)
 
-    if amount_available > SERIES_B_TOTAL_AMOUNT:
-
-        # check if they have already exchanged in the Series A
+    if time < SERIES_A_END:
         r1key = concat(address, SERIES_A_KEY)
-        has_exchanged = Get(ctx, r1key)
-
-        # if not, then save the exchange for Series A
-        if not has_exchanged:
+        if amount_available - new_amount >= SERIES_B_TOTAL_AMOUNT:
             # note that this method can be invoked during the Verification trigger, so we have the
             # verify_only param to avoid the Storage.Put during the read-only Verification trigger.
             # this works around a "method Neo.Storage.Put not found in ->" error in InteropService.py
@@ -205,6 +195,7 @@ def calculate_can_exchange(ctx, amount, address, verify_only):
                 Put(ctx, r1key, True)
             return True
 
-        return False
+    if time < SERIES_B_END:
+        return True
 
     return False

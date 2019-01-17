@@ -21,33 +21,31 @@ TOKEN_CIRC_KEY = b'in_circulation'
 
 TOKEN_TOTAL_SUPPLY = 100000000 * 100000000  # 100m total supply * 10^8 ( decimals)
 
-TOKEN_OWNER_AMOUNT = 20200000 * 100000000  # 20.2m to owners * 10^8
+TOKEN_OWNER_AMOUNT = 25200000 * 100000000  # 25m owners + 200k airdrop
 
 CHALLENGE_SYSTEM_INITIAL_AMOUNT = 55000000 * 100000000 # 55m to the Challenge Reserve.
 
-# for now assume 1 dollar per token, and one neo = 40 dollars * 10^8
-TOKENS_PER_NEO = 40 * 100000000
+SERIES_B_TOTAL_AMOUNT = 15800000 * 100000000 # total amount available to during Series B
 
-# for now assume 1 dollar per token, and one gas = 20 dollars * 10^8
-TOKENS_PER_GAS = 20 * 100000000
+INITIAL_MINING_RATE = 50 * 100000000 # Initial mining rate upon deployment.
 
-# maximum amount you can mint in the limited round ( 500 neo/person * 40 Tokens/NEO * 10^8 )
-MAX_EXCHANGE_LIMITED_ROUND = 500 * 40 * 100000000
+# Token Gas conversion rate for Series A
+TOKENS_PER_GAS_SERIES_A = 905000000
 
-# maximum amount available to during Series A
-SERIES_B_TOTAL_AMOUNT = 15800000 * 100000000
+# Token Gas conversion rate for Series B
+TOKENS_PER_GAS_SERIES_B = 769000000
 
-# when to start the crowdsale
-BLOCK_SALE_START = 0
+# Series A Token Sale Start Date (Sat, 06 Apr 2019 00:00 AM)
+SERIES_A_START = 1554526800
 
-# when to end the initial limited round
-LIMITED_ROUND_END = 0
+# Series A Token Sale End Date (Thu, 06 Jun 2019 00:00 AM)
+SERIES_A_END = 1559797200
 
-# Series A Token Sale Start
-SERIES_A_START = 0
+# Series B Token Sale Start Date (Sat, 05 Oct 2019 00:00 AM)
+SERIES_B_START = 1570251600
 
-# Series B Token Sale Start
-SERIES_B_START = 0
+# Series B Token Sale End Date (Thu, 05 Dec 2019 00:00 AM)
+SERIES_B_END = 1575522000
 
 KYC_KEY = b'kyc_ok'
 
@@ -105,15 +103,13 @@ def get_mining_rate(ctx):
     """
     # Needs to be tested more thoroughly especially when the supply increases.
 
-    initial_mining_rate = 50 * 100000000
-
     current_reserve = Get(ctx, CHALLENGE_SYSTEM_RESERVE)
 
     if current_reserve != 0:
 
         current_inverse_rate = CHALLENGE_SYSTEM_INITIAL_AMOUNT / current_reserve
 
-        return initial_mining_rate / current_inverse_rate
+        return INITIAL_MINING_RATE / current_inverse_rate
 
     else:
 
@@ -130,9 +126,10 @@ def get_promoter_mining_rate(ctx):
 
     mining_rate = get_mining_rate(ctx)
 
-    rate = mining_rate/10
+    rate = mining_rate / 10
 
     return rate * 80
+
 
 def get_rejecter_mining_rate(ctx, number_of_rejecters):
     """
@@ -144,11 +141,12 @@ def get_rejecter_mining_rate(ctx, number_of_rejecters):
 
     mining_rate = get_mining_rate(ctx)
 
-    rate = mining_rate/100
+    rate = mining_rate / 100
 
     rejecters_reward = 8 * rate
 
     return rejecters_reward / number_of_rejecters
+    
 
 def get_approver_mining_rate(ctx, number_of_approvers):
     """
@@ -160,7 +158,7 @@ def get_approver_mining_rate(ctx, number_of_approvers):
 
     mining_rate = get_mining_rate(ctx)
 
-    rate = mining_rate/100
+    rate = mining_rate / 100
 
     approvers_reward = 12 * rate
 

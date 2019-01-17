@@ -76,10 +76,6 @@ def handle_mining(ctx, operation, args):
         rate = get_rejecter_mining_rate(ctx, args[0])
         return rate
 
-    if operation == 'get_referral_mining_rate':
-        rate = get_referral_mining_rate(ctx)
-        return rate
-
     if operation == 'check_challenge_package':
         owner = args[0]
         if CheckWitness(owner) and check(ctx, owner):

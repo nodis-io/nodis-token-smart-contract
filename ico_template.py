@@ -13,12 +13,12 @@ from nodis.token import *
 from nodis.crowdsale import *
 from nodis.nep5 import *
 from nodis.mining import handle_mining
-from boa.interop.Neo.Runtime import GetTrigger, CheckWitness, Log, Notify
+from boa.interop.Neo.Runtime import GetTrigger, CheckWitness, Log, Notify, GetTime
 from boa.interop.Neo.TriggerType import Application, Verification
 from boa.interop.Neo.Storage import *
 
 ctx = GetContext()
-NEP5_METHODS = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'transferFrom', 'approve', 'allowance']
+NEP5_METHODS = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'transferFrom', 'approve', 'allowance', 'reallocate']
 MINING_METHODS = ['register_business', 'check_business', 'signout_business', 'create_challenge', 'close_challenge', 'submit', 'approve_submission', 'reject_submission', 'promoter_claim', 'approver_claim', 'rejecter_claim', 'get_mining_rate', 'get_promoter_mining_rate', 'get_approver_mining_rate', 'get_rejecter_mining_rate', 'check_challenge_package', 'buy_challenge_package', 'challenge_reserve']
 
 
@@ -81,6 +81,9 @@ def Main(operation, args):
         elif operation == 'crowdsale_available':
             return crowdsale_available_amount(ctx)
 
+        elif operation == 'reallocate':
+            return reallocate()
+
         elif operation == 'get_attachments':
             return get_asset_attachments()
 
@@ -92,7 +95,6 @@ def Main(operation, args):
 def deploy():
     """
 
-    :param token: Token The token to deploy
     :return:
         bool: Whether the operation was successful
     """
@@ -103,10 +105,46 @@ def deploy():
     if not Get(ctx, 'initialized'):
         # do deploy logic
         Put(ctx, 'initialized', 1)
+
         Put(ctx, TOKEN_OWNER, TOKEN_OWNER_AMOUNT)
+
         Put(ctx, CHALLENGE_SYSTEM_RESERVE, CHALLENGE_SYSTEM_INITIAL_AMOUNT)
+        
         circulation = TOKEN_OWNER_AMOUNT + CHALLENGE_SYSTEM_INITIAL_AMOUNT
+
         Log("Deployed successfully!")
+
         return add_to_circulation(ctx, circulation)
 
     return False
+
+def reallocate():
+    """
+
+    Once the token sale is over, the owner can take the remaining tokens.
+    :return:
+        bool: Whether the operation was successful
+    """
+    if not CheckWitness(TOKEN_OWNER):
+        print("Must be owner to reallocate")
+        return False
+
+    time = GetTime()
+
+    if time < SERIES_B_END:
+        print("Must wait until the end of Series B before re-allocating.")
+        return False
+
+    current_balance = Get(ctx, TOKEN_OWNER)
+
+    crowdsale_available = crowdsale_available_amount()
+
+    new_balance = current_balance + crowdsale_available
+
+    Put(ctx, TOKEN_OWNER, new_balance)
+
+    Log("Reallocated successfully!")
+
+    return add_to_circulation(ctx, crowdsale_available)
+
+    return True

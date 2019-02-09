@@ -136,7 +136,11 @@ def can_exchange(ctx, attachments, verify_only):
 
     # calculate the amount requested
     # this would work for accepting gas
-    amount_requested = attachments.gas_attached * token.tokens_per_gas / 100000000
+    time = GetTime()
+    if time < SERIES_A_END:
+        amount_requested = attachments[3] * TOKENS_PER_GAS_SERIES_A / 100000000
+    else:
+        amount_requested = attachments[3] * TOKENS_PER_GAS_SERIES_B / 100000000
 
     exchange_ok = calculate_can_exchange(ctx, amount_requested, attachments[1], verify_only)
 

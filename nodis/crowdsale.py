@@ -75,8 +75,8 @@ def perform_exchange(ctx):
         # block before the total amount is reached.  An amount of TX will get through
         # the verification phase because the total amount cannot be updated during that phase
         # because of this, there should be a process in place to manually refund tokens
-        if attachments.gas_attached > 0:
-            OnRefund(attachments.sender_addr, attachments.gas_attached)
+        if attachments[3] > 0:
+            OnRefund(attachments[1], attachments[3])
         return False
 
     # lookup the current balance of the address

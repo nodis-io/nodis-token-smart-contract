@@ -96,4 +96,3 @@ For testing purposes, this template is deployed on testnet with the following co
     "email": "tom@neonexchange.org"
 }
 ```
-

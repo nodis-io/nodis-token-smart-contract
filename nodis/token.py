@@ -12,8 +12,8 @@ TOKEN_SYMBOL = 'NODIS'
 TOKEN_DECIMALS = 8
 
 # This is the script hash of the address for the owner of the token
-# TOKEN_OWNER = b'\x9e\x9a\\\xfd\xb5\x18\xb83\x89e\xf4\x94\xb2\x15u\x0eh\xc2,\xa7'
-TOKEN_OWNER = b'>\xf2\x96Nh5\xd7^M\x88\x9be\\\x06R\xa0J\x12\xbc\xe1' # dom first testnet hash
+TOKEN_OWNER = b'\x9e\x9a\\\xfd\xb5\x18\xb83\x89e\xf4\x94\xb2\x15u\x0eh\xc2,\xa7'
+#TOKEN_OWNER = b'>\xf2\x96Nh5\xd7^M\x88\x9be\\\x06R\xa0J\x12\xbc\xe1' # dom first testnet hash
 #TOKEN_OWNER = b'Uh\x00a\x8b\x1e\xb7\xd3]\xf0/\xadbF\xc4#\x1dE\x1ch' # dmo second testnet hash
 
 # Address of the challenge reserve
@@ -39,19 +39,19 @@ TOKENS_PER_GAS_SERIES_B = 769000000
 
 # Series A Token Sale Start Date (Sat, 06 Apr 2019 00:00 AM = 5AM GMT)
 # SERIES_A_START = 1554526800
-SERIES_A_START = 1549839600
+SERIES_A_START = 1549972800
 
 # Series A Token Sale End Date (Thu, 06 Jun 2019 00:00 AM)
 # SERIES_A_END = 1559797200
-SERIES_A_END = 1549857600
+SERIES_A_END = 1550037600
 
 # Series B Token Sale Start Date (Sat, 05 Oct 2019 00:00 AM)
 # SERIES_B_START = 1570251600
-SERIES_B_START = 1549933200
+SERIES_B_START = 1550041200
 
 # Series B Token Sale End Date (Thu, 05 Dec 2019 00:00 AM)
 # SERIES_B_END = 1575522000
-SERIES_B_END = 1549944000
+SERIES_B_END = 1550149200
 
 KYC_KEY = b'kyc_ok'
 

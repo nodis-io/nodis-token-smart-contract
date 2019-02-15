@@ -18,7 +18,7 @@ from boa.interop.Neo.TriggerType import Application, Verification
 from boa.interop.Neo.Storage import *
 
 ctx = GetContext()
-NEP5_METHODS = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'transferFrom', 'approve', 'allowance', 'reallocate']
+NEP5_METHODS = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'transferFrom', 'approve', 'allowance']
 MINING_METHODS = ['register_business', 'check_business', 'signout_business', 'create_challenge', 'close_challenge', 'submit', 'approve_submission', 'reject_submission', 'promoter_claim', 'approver_claim', 'rejecter_claim', 'get_mining_rate', 'get_promoter_mining_rate', 'get_approver_mining_rate', 'get_rejecter_mining_rate', 'check_challenge_package', 'buy_challenge_package', 'challenge_reserve']
 
 
@@ -137,7 +137,7 @@ def reallocate():
 
     current_balance = Get(ctx, TOKEN_OWNER)
 
-    crowdsale_available = crowdsale_available_amount()
+    crowdsale_available = crowdsale_available_amount(ctx)
 
     new_balance = current_balance + crowdsale_available
 

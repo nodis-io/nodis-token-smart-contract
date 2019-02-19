@@ -71,10 +71,6 @@ def perform_exchange(ctx):
     exchange_ok = can_exchange(ctx, attachments, False)
 
     if not exchange_ok:
-        # This should only happen in the case that there are a lot of TX on the final
-        # block before the total amount is reached.  An amount of TX will get through
-        # the verification phase because the total amount cannot be updated during that phase
-        # because of this, there should be a process in place to manually refund tokens
         print("You cannot exchange! Contact Nodis for refunds!")
         if attachments[3] > 0:
             OnRefund(attachments[1], attachments[3])
@@ -133,8 +129,10 @@ def can_exchange(ctx, attachments, verify_only):
     # this is not required for operation of the contract
 
     if not get_kyc_status(ctx, attachments[1]):
+        print("You have not been registered for the Token sale.")
         return False
 
+    print("You have been registered for the Token sale.")
     # calculate the amount requested
     # this would work for accepting gas
     if time < SERIES_A_END:

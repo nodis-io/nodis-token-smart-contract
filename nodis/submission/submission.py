@@ -23,10 +23,8 @@ def generate_submission_key(challenger, owner, challenge_id):
 def create_submission(ctx, challenger, owner, challenge_id):
     challenge_key = generate_challenge_key(owner, challenge_id)
     Log("Generating challenge key.")
-    Log(challenge_key)
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
-    Log(submission_key)
     Log("Initiating a new submission.")
     submission = {
         'challenger': challenger, 
@@ -54,7 +52,6 @@ def create_submission(ctx, challenger, owner, challenge_id):
 def approve(ctx, voter, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
-    Log(submission_key)
     submission = get_submission(ctx, submission_key)
     if GetTime() < submission['timestamp'] + 86400:
         voters = submission['voters']
@@ -88,7 +85,6 @@ def approve(ctx, voter, challenger, owner, challenge_id):
 def reject(ctx, voter, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
-    Log(submission_key)
     submission = get_submission(ctx, submission_key)
     if GetTime() < submission['timestamp'] + 86400:
         voters = submission['voters']
@@ -123,7 +119,6 @@ def reject(ctx, voter, challenger, owner, challenge_id):
 def promoter_fund_claim(ctx, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
-    Log(submission_key)
     submission = get_submission(ctx, submission_key)
     if GetTime() >= submission['timestamp'] + 86400:
         Log("Submission is closed.")
@@ -148,7 +143,6 @@ def promoter_fund_claim(ctx, challenger, owner, challenge_id):
 def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
-    Log(submission_key)
     submission = get_submission(ctx, submission_key)
     if GetTime() >= submission['timestamp'] + 86400:
         Log("Submission is closed.")
@@ -176,7 +170,6 @@ def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
 def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
-    Log(submission_key)
     submission = get_submission(ctx, submission_key)
     if GetTime() >= submission['timestamp'] + 86400:
         Log("Submission is closed.")
@@ -200,3 +193,18 @@ def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
     else:
         Log("Submission is still open.")
         return False
+
+def submission_approver_number(ctx, challenger, owner, challenge_id):
+    submission_key = generate_submission_key(challenger, owner, challenge_id)
+    submission = get_submission(ctx, submission_key)
+    return submission['approver_count']
+
+def submission_rejecter_number(ctx, challenger, owner, challenge_id):
+    submission_key = generate_submission_key(challenger, owner, challenge_id)
+    submission = get_submission(ctx, submission_key)
+    return submission['rejecter_count']
+
+def submission_expiry_date(ctx, challenger, owner, challenge_id):
+    submission_key = generate_submission_key(challenger, owner, challenge_id)
+    submission = get_submission(ctx, submission_key)
+    return submission['timestamp'] + 86400

@@ -7,8 +7,8 @@ from boa.builtins import concat
 
 from nodis.token import *
 from nodis.nep5 import do_transfer_from
-from nodis.challenge.challenge import create_challenge, submit, close_challenge, check_challenge_package, buy_challenge_package
-from nodis.submission.submission import create_submission, approve, reject, promoter_fund_claim, rejecter_fund_claim
+from nodis.challenge.challenge import create_challenge, submit, close_challenge, check_challenge_package, buy_challenge_package, is_challenge_closed, is_challenge_open, submission_number, challenge_expiry_date
+from nodis.submission.submission import create_submission, approve, reject, promoter_fund_claim, rejecter_fund_claim, submission_approver_number, submission_rejecter_number, submission_expiry_date
 
 
 OnTransfer = RegisterAction('transfer', 'addr_from', 'addr_to', 'amount')
@@ -78,11 +78,8 @@ def handle_mining(ctx, operation, args):
 
     if operation == 'check_challenge_package':
         owner = args[0]
-        if CheckWitness(owner) and check(ctx, owner):
-            Log("Checking challenge package.")
-            return check_challenge_package(ctx, owner)
-        else:
-            return False
+        Log("Checking challenge package.")
+        return check_challenge_package(ctx, owner)
 
     if operation == 'buy_challenge_package':
         business = args[0]
@@ -110,6 +107,26 @@ def handle_mining(ctx, operation, args):
         else:
             return False
 
+    if operation == 'is_challenge_closed':
+        owner = args[0]
+        challenge_id = args[1]
+        return is_challenge_closed(ctx, owner, challenge_id)
+    
+    if operation == 'is_challenge_open':
+        owner = args[0]
+        challenge_id = args[1]
+        return is_challenge_open(ctx, owner, challenge_id)
+
+    if operation == 'submission_number':
+        owner = args[0]
+        challenge_id = args[1]
+        return submission_number(ctx, owner, challenge_id)
+
+    if operation == 'challenge_expiry_date':
+        owner = args[0]
+        challenge_id = args[1]
+        return challenge_expiry_date(ctx, owner, challenge_id)
+
     if operation == 'submit':
         if CheckWitness(args[0]):
             challenger = args[0]
@@ -120,6 +137,24 @@ def handle_mining(ctx, operation, args):
             return status
         else:
             return False
+
+    if operation == 'submission_approver_number':
+        challenger = args[0]
+        owner = args[1]
+        challenge_id = args[2]
+        return submission_approver_number(ctx, challenger, owner, challenge_id)
+
+    if operation == 'submission_rejecter_number':
+        challenger = args[0]
+        owner = args[1]
+        challenge_id = args[2]
+        return submission_rejecter_number(ctx, challenger, owner, challenge_id)
+
+    if operation == 'submission_expiry_date':
+        challenger = args[0]
+        owner = args[1]
+        challenge_id = args[2]
+        return submission_expiry_date(ctx, challenger, owner, challenge_id)
 
     if operation == 'approve_submission':
         if CheckWitness(args[0]):
@@ -201,6 +236,9 @@ def handle_mining(ctx, operation, args):
         else:
             return False
 
+    if operation == 'load_challenge_reserve':
+        return load_challenge_reserve(ctx, args[0])
+
     return False
 
 def claim_funds(ctx, t_from, t_to, amount):
@@ -221,4 +259,33 @@ def claim_funds(ctx, t_from, t_to, amount):
     Put(ctx, t_from, new_from_balance)
     OnTransfer(t_from, t_to, amount)
     print("Funds have been successfully claimed.")
+    return True
+
+def load_challenge_reserve(ctx, amount):
+    if not CheckWitness(TOKEN_OWNER):
+        print("Needs to be the token owner.")
+        return False
+
+    if amount <= 0:
+        print("Negative amount.")
+        return False
+
+    owner_balance = Get(ctx, TOKEN_OWNER)
+    if balance < amount:
+        print("The owner does not have enough balance.")
+        return False
+
+    current_challenge_reserve = Get(ctx, CHALLENGE_SYSTEM_RESERVE)
+    if current_challenge_reserve + amount > CHALLENGE_SYSTEM_INITIAL_AMOUNT:
+        print("Funds would exceed the maximum amount for challenge reserve.")
+        return False
+
+    print("Adding funds to the challenge reserve.")
+
+    new_balance = owner_balance - amount
+    Put(ctx, TOKEN_OWNER, new_balance)
+
+    new_challenge_reserve = current_challenge_reserve + amount
+    Put(ctx, CHALLENGE_SYSTEM_RESERVE, new_challenge_reserve)
+
     return True

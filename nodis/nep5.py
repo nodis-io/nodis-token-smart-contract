@@ -58,11 +58,10 @@ def do_transfer(ctx, t_from, t_to, amount):
     if t_from == CHALLENGE_SYSTEM_RESERVE:
         return False
 
-    if CheckWitness(t_from):
+    if t_to == CHALLENGE_SYSTEM_RESERVE:
+        return False
 
-        if t_to == CHALLENGE_SYSTEM_RESERVE and not CheckWitness(TOKEN_OWNER):
-            print("You cannot transfer to the Challenge System Reserve!")
-            return False
+    if CheckWitness(t_from):
 
         if t_from == t_to:
             print("transfer to self!")

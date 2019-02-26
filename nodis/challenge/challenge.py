@@ -55,7 +55,6 @@ def get_challenge(ctx, challenge_key):
 def create_challenge(ctx, owner, challenge_id):
     challenge_key = generate_challenge_key(owner, challenge_id)
     Log("Generating challenge key.")
-    Log(challenge_key)
     last_challenge_date = last_challenge_timestamp(ctx, owner)
     challenge_package = check_challenge_package(ctx, owner)
     using_package = False
@@ -86,7 +85,7 @@ def create_challenge(ctx, owner, challenge_id):
             update_last_challenge_date(ctx, owner, challenge['timestamp'])
             if using_package:
                 decrement_challenge_package(ctx, owner)
-            return challenge_key
+            return True
         else:
             Log("Challenge key already exists.")
             return False
@@ -128,8 +127,24 @@ def close_challenge(ctx, owner, challenge_id):
         challenge['state'] = 'CLOSED'
         put(ctx, challenge_key, challenge)
         Log("Challenge closed.")
-    return challenge_key
+    return True
 
-def is_closed(ctx, challenge_key):
+def is_challenge_closed(ctx, owner, challenge_id):
+    challenge_key = generate_challenge_key(owner, challenge_id)
     challenge = get_challenge(ctx, challenge_key)
     return challenge['state'] == 'CLOSED'
+
+def is_challenge_open(ctx, owner, challenge_id):
+    challenge_key = generate_challenge_key(owner, challenge_id)
+    challenge = get_challenge(ctx, challenge_key)
+    return challenge['state'] == 'OPEN'
+
+def submission_number(ctx, owner, challenge_id):
+    challenge_key = generate_challenge_key(owner, challenge_id)
+    challenge = get_challenge(ctx, challenge_key)
+    return len(challenge['submissions'])
+
+def challenge_expiry_date(ctx, owner, challenge_id):
+    challenge_key = generate_challenge_key(owner, challenge_id)
+    challenge = get_challenge(ctx, challenge_key)
+    return challenge['timestamp'] + 1209600

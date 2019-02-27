@@ -21,31 +21,20 @@ TOKEN_CIRC_KEY = b'in_circulation'
 
 TOKEN_TOTAL_SUPPLY = 100000000 * 100000000  # 100m total supply * 10^8 ( decimals)
 
-TOKEN_OWNER_AMOUNT = 25200000 * 100000000  # 25m owners + 200k airdrop
+TOKEN_OWNER_AMOUNT = 41000000 * 100000000  # 41m owners for airdrop and private sales.
 
 CHALLENGE_SYSTEM_INITIAL_AMOUNT = 55000000 * 100000000 # 55m to the Challenge Reserve.
-
-SERIES_B_TOTAL_AMOUNT = 19000000 * 100000000 # total amount available to during Series B
 
 INITIAL_MINING_RATE = 50 * 100000000 # Initial mining rate upon deployment.
 
 # Token Gas conversion rate for Series A
 TOKENS_PER_GAS_SERIES_A = 905000000
 
-# Token Gas conversion rate for Series B
-TOKENS_PER_GAS_SERIES_B = 769000000
-
 # Series A Token Sale Start Date (Sat, 06 Apr 2019 00:00 AM = 5AM GMT)
 SERIES_A_START = 1554526800
 
 # Series A Token Sale End Date (Thu, 06 Jun 2019 00:00 AM)
 SERIES_A_END = 1559797200
-
-# Series B Token Sale Start Date (Sat, 05 Oct 2019 00:00 AM)
-SERIES_B_START = 1570251600
-
-# Series B Token Sale End Date (Thu, 05 Dec 2019 00:00 AM)
-git commit -SERIES_B_END = 1575522000
 
 KYC_KEY = b'kyc_ok'
 

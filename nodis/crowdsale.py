@@ -11,6 +11,7 @@ from nodis.txio import get_asset_attachments
 OnKYCRegister = RegisterAction('kyc_registration', 'address')
 OnTransfer = RegisterAction('transfer', 'addr_from', 'addr_to', 'amount')
 OnRefund = RegisterAction('refund', 'addr_to', 'amount')
+
 time = GetTime()
 
 def kyc_register(ctx, args):
@@ -76,23 +77,14 @@ def perform_exchange(ctx):
             OnRefund(attachments[1], attachments[3])
         return False
 
-    print("You are registered with us! We will exchange tokens with you now!")
+    print("We will proceed with the exchange of tokens now.")
 
     # lookup the current balance of the address
     current_balance = Get(ctx, attachments[1])
 
-    
-    # Sending back 9
-    if time < SERIES_A_END:
-        if time > SERIES_A_START:
-            print("Series A rate!")
-            exchanged_tokens = attachments[3] * TOKENS_PER_GAS_SERIES_A / 100000000
+    exchanged_tokens = attachments[3] * TOKENS_PER_GAS_SERIES_A / 100000000
 
-    else:
-        print("Series B rate!")
-        exchanged_tokens = attachments[3] * TOKENS_PER_GAS_SERIES_B / 100000000
-
-    # add it to the the exchanged tokens and persist in storage
+    # add it to the exchanged tokens and persist in storage
     new_total = exchanged_tokens + current_balance
     Put(ctx, attachments[1], new_total)
 
@@ -132,17 +124,10 @@ def can_exchange(ctx, attachments, verify_only):
         print("You have not been registered for the Token sale.")
         return False
 
-    print("You have been registered for the Token sale.")
+    print("You are registered for the Token sale.")
+    
     # calculate the amount requested
-    # this would work for accepting gas
-    if time < SERIES_A_END:
-        print("Series A is not over!")
-        amount_requested = attachments[3] * TOKENS_PER_GAS_SERIES_A / 100000000
-    else:
-        print("Series A is closed!")
-        amount_requested = attachments[3] * TOKENS_PER_GAS_SERIES_B / 100000000
-    print("Attempting to mint tokens...")
-    print(amount_requested)
+    amount_requested = attachments[3] * TOKENS_PER_GAS_SERIES_A / 100000000
 
     exchange_ok = calculate_can_exchange(ctx, amount_requested, attachments[1], verify_only)
 
@@ -173,35 +158,23 @@ def calculate_can_exchange(ctx, amount, address, verify_only):
         bool: Whether or not an address can exchange a specified amount
     """
 
-    current_in_circulation = Get(ctx, TOKEN_CIRC_KEY)
-
-    new_amount = current_in_circulation + amount
-
     if time < SERIES_A_START:
         print("Series A has not started!")
         return False
 
-    if time > SERIES_B_END:
-        print("Series B is over!")
+    if time > SERIES_A_END:
+        print("Series A is over! Please contact Nodis for private sales.")
         return False
 
-    if new_amount > TOKEN_TOTAL_SUPPLY:
-        print("Not enough tokens available. Contact Nodis for private sales!")
-        return False
-
-    # check amount in Series A
+    # check amount available for Series A
     amount_available = crowdsale_available_amount(ctx)
 
-    if time < SERIES_A_END:
-        if amount_available - amount >= SERIES_B_TOTAL_AMOUNT:
-            print("Tokens available for Series A!")
-            return True
-        else:
-            print("No more token available for Series A. Series B is coming up soon!")
-            return False
+    if amount > amount_available:
+        print("Not enough tokens available for Series A!")
+        return False
 
-    if time > SERIES_B_START:
-        print("Tokens available for Series B!")
+    else:
+        print("Tokens available for Series A!")
         return True
 
     return False

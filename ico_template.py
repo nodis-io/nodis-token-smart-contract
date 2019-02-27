@@ -106,22 +106,25 @@ def deploy():
         # do deploy logic
         Put(ctx, 'initialized', 1)
 
+        # Allocate owner balance of 41 m
         Put(ctx, TOKEN_OWNER, TOKEN_OWNER_AMOUNT)
 
+        # Allocate Challenge Reserve balance
         Put(ctx, CHALLENGE_SYSTEM_RESERVE, CHALLENGE_SYSTEM_INITIAL_AMOUNT)
         
         circulation = TOKEN_OWNER_AMOUNT + CHALLENGE_SYSTEM_INITIAL_AMOUNT
 
         Log("Deployed successfully!")
 
+        # Add owner balance and challenge reserve balance to circulation
         return add_to_circulation(ctx, circulation)
 
     return False
 
 def reallocate():
     """
-
-    Once the token sale is over, the owner can take the remaining tokens.
+    
+    Once the token sale is over, the owner can take back the remaining tokens.
     :return:
         bool: Whether the operation was successful
     """
@@ -131,8 +134,8 @@ def reallocate():
 
     time = GetTime()
 
-    if time < SERIES_B_END:
-        print("Must wait until the end of Series B before re-allocating.")
+    if time < SERIES_A_END:
+        print("Must wait until the end of Series A before re-allocating.")
         return False
 
     current_balance = Get(ctx, TOKEN_OWNER)

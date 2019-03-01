@@ -1,7 +1,7 @@
 from boa.interop.Neo.Storage import *
 from boa.interop.Neo.Runtime import Notify, Serialize, Deserialize, Log, GetTime
 from utils import concat_bytes, contains
-from nodis.challenge.challenge import submit, get_challenge, is_closed, generate_challenge_key
+from nodis.challenge.challenge import submit, get_challenge, is_challenge_closed, generate_challenge_key
 
 def put(ctx, submission_key, submission):
     to_save = Serialize(submission)

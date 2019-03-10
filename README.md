@@ -99,7 +99,7 @@ This contract was audited by Red4Sec CyberSecurity S.L.
 
 <p align="center">
   <img
-    src="https://red4sec.com/en"
+    src="https://red4sec.com/images/logo.png"
     width="125px;">
 <p align="center"><a href="https://red4sec.com/en">Website</a></p>
     

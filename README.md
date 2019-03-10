@@ -34,8 +34,6 @@ This contract has been designed and developed by the NODIS team. It will serve d
 
 `sc invoke <contract hash> get_rejecter_mining_rate [1]` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-`sc invoke <contract address> transfer ["<admin address>", "b'CHALLENGE_SYSTEM_RESERVE'", 500]` <span style="color:BlueViolet;border-color:BlueViolet;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">ADMIN</span>
-
 
 ## Challenge System 
 

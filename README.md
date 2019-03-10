@@ -12,7 +12,7 @@
 
 This contract has been designed and developed by the NODIS team. It will serve during the token sales and throughout the entire duration of the NODIS project.
 
-#Commands
+# Commands
 
 ## Token Sale / ICO
 
@@ -96,10 +96,9 @@ This contract has been designed and developed by the NODIS team. It will serve d
 # Audit
 
 This contract was audited by **Red4Sec CyberSecurity S.L**.
-
 <p align="center">
   <img
     src="https://red4sec.com/images/logo.png"
-    href="https://red4sec.com/en"
-    width="125px;">  
+    width="125px;">
 </p>
+<p><a href="https://red4sec.com/en">See Website</a>.</p> 

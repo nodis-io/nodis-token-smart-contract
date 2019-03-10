@@ -12,7 +12,7 @@ TOKEN_SYMBOL = 'NODIS'
 TOKEN_DECIMALS = 8
 
 # This is the script hash of the address for the owner of the token
-TOKEN_OWNER = b'\x9e\x9a\\\xfd\xb5\x18\xb83\x89e\xf4\x94\xb2\x15u\x0eh\xc2,\xa7'
+TOKEN_OWNER = b'\xcca\xe4\xaa\x9eS\x13.\xb1o\x10}\xf6|\x01\x06\x1f\x8b\xa2K'
 
 # Address of the challenge reserve
 CHALLENGE_SYSTEM_RESERVE = b'CHALLENGE_SYSTEM_RESERVE'
@@ -31,10 +31,12 @@ INITIAL_MINING_RATE = 50 * 100000000 # Initial mining rate upon deployment.
 TOKENS_PER_GAS_SERIES_A = 905000000
 
 # Series A Token Sale Start Date (Sat, 06 Apr 2019 00:00 AM = 5AM GMT)
-SERIES_A_START = 1554526800
+# SERIES_A_START = 1554526800
+SERIES_A_START = 1551398400
 
 # Series A Token Sale End Date (Thu, 06 Jun 2019 00:00 AM)
-SERIES_A_END = 1559797200
+# SERIES_A_END = 1559797200
+SERIES_A_END = 1554854400
 
 KYC_KEY = b'kyc_ok'
 
@@ -90,7 +92,7 @@ def get_mining_rate(ctx):
     :return:
         int: Current mining rate
     """
-    # Needs to be tested more thoroughly especially when the supply increases.
+    # V24
 
     current_reserve = Get(ctx, CHALLENGE_SYSTEM_RESERVE)
 
@@ -114,8 +116,8 @@ def get_promoter_mining_rate(ctx):
     """
 
     mining_rate = get_mining_rate(ctx)
-
-    rate = mining_rate / 10
+    # V5
+    rate = mining_rate / 100
 
     return rate * 80
 

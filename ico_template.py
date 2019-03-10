@@ -1,11 +1,11 @@
 """
-NEX ICO Template
+NODIS Token Smart Contract
 ===================================
 
-Author: Thomas Saunders
-Email: tom@neonexchange.org
+Authors: Nathan Mukena & Dominic Fung
+Emails: nathan.mukena@nodis.io & dominic.fung@nodis.io
 
-Date: Dec 11 2017
+Date: March 15 2019
 
 """
 from nodis.txio import get_asset_attachments
@@ -16,10 +16,11 @@ from nodis.mining import handle_mining
 from boa.interop.Neo.Runtime import GetTrigger, CheckWitness, Log, Notify, GetTime
 from boa.interop.Neo.TriggerType import Application, Verification
 from boa.interop.Neo.Storage import *
+from boa.interop.Neo.Blockchain import Migrate, Destroy
 
 ctx = GetContext()
 NEP5_METHODS = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'transferFrom', 'approve', 'allowance']
-MINING_METHODS = ['register_business', 'check_business', 'signout_business', 'create_challenge', 'close_challenge', 'submit', 'approve_submission', 'reject_submission', 'promoter_claim', 'approver_claim', 'rejecter_claim', 'get_mining_rate', 'get_promoter_mining_rate', 'get_approver_mining_rate', 'get_rejecter_mining_rate', 'check_challenge_package', 'buy_challenge_package', 'challenge_reserve', 'is_challenge_closed', 'is_challenge_open', 'submission_number', 'challenge_expiry_date', 'submission_approver_number', 'submission_rejecter_number', 'submission_expiry_date']
+MINING_METHODS = ['register_business', 'check_business', 'signout_business', 'create_challenge', 'close_challenge', 'submit', 'approve_submission', 'reject_submission', 'promoter_claim', 'approver_claim', 'rejecter_claim', 'get_mining_rate', 'get_promoter_mining_rate', 'get_approver_mining_rate', 'get_rejecter_mining_rate', 'check_challenge_package', 'buy_challenge_package', 'challenge_reserve', 'load_challenge_reserve', 'is_challenge_closed', 'is_challenge_open', 'submission_number', 'challenge_expiry_date', 'submission_approver_number', 'submission_rejecter_number', 'submission_expiry_date']
 
 
 def Main(operation, args):
@@ -43,12 +44,16 @@ def Main(operation, args):
 
         # If owner, proceed
         if is_owner:
-
             return True
 
         # Otherwise, we need to lookup the assets and determine
         # If attachments of assets is ok
         attachments = get_asset_attachments()
+
+        #V1
+        if attachments[5]:
+            return False
+
         return can_exchange(ctx, attachments, True)
 
     elif trigger == Application():
@@ -86,6 +91,26 @@ def Main(operation, args):
 
         elif operation == 'get_attachments':
             return get_asset_attachments()
+
+        #V17
+        elif operation == 'supportedStandards':
+            return ['NEP-5', 'NEP-10']
+
+        elif operation == 'migrate':
+            #V11
+            if len(args) != 8:
+                return False
+            if not CheckWitness(TOKEN_OWNER):
+                return False
+            Migrate(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7])
+            return True
+
+        elif operation == 'destroy':
+            #V11
+            if not CheckWitness(TOKEN_OWNER):   
+                return False
+            Destroy()
+            return True
 
         return 'unknown operation'
 
@@ -148,6 +173,5 @@ def reallocate():
 
     Log("Reallocated successfully!")
 
+    # V14
     return add_to_circulation(ctx, crowdsale_available)
-
-    return True

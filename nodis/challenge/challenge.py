@@ -3,9 +3,11 @@ from boa.interop.Neo.Runtime import Log, Serialize, Deserialize, GetTime
 from utils import concat_bytes, contains
 
 def generate_challenge_key(owner, challenge_id):
-    return concat_bytes(['Challenge{owner:String=',owner,';challenge:Number=',challenge_id,'}'])
+    # V21
+    return concat_bytes(['C{O=',owner,'&I=',challenge_id,'}'])
 
-def put(ctx, challenge_key, challenge):
+#V19
+def set_challenge(ctx, challenge_key, challenge):
     Log("Storing challenge.")
     to_save = Serialize(challenge)
     Put(ctx, challenge_key, to_save)
@@ -22,6 +24,8 @@ def last_challenge_timestamp(ctx, owner):
 def update_last_challenge_date(ctx, owner, timestamp):
     key = concat('Last_Challenge_',owner)
     Put(ctx, key, timestamp)
+    # V14
+    return True
 
 def check_challenge_package(ctx, owner):
     key = concat('Challenge_Package_', owner)
@@ -43,6 +47,8 @@ def decrement_challenge_package(ctx, owner):
     challenges = check_challenge_package(ctx, owner)
     number_challenges = challenges - 1
     Put(ctx, key, number_challenges)
+    #V14
+    return True
 
 def get_challenge(ctx, challenge_key):
     Log("Retrieving challenge.")
@@ -68,7 +74,7 @@ def create_challenge(ctx, owner, challenge_id):
         using_package = True
         Log("The business has created a challenge in the past 30 days. Using challenge package.")
     else:
-        Log("The last challenger created by the business was less than 30 days ago.")
+        Log("The last challenge created by the business was less than 30 days ago.")
         Log("The business challenge package is empty.")
     
     if can_create_challenge:
@@ -81,7 +87,8 @@ def create_challenge(ctx, owner, challenge_id):
                 'submissions': [],
                 'timestamp': GetTime()
             }
-            put(ctx, challenge_key, challenge)
+            # V19
+            set_challenge(ctx, challenge_key, challenge)
             update_last_challenge_date(ctx, owner, challenge['timestamp'])
             if using_package:
                 decrement_challenge_package(ctx, owner)
@@ -96,55 +103,83 @@ def create_challenge(ctx, owner, challenge_id):
 
 def submit(ctx, challenge_key, submission_key):
     challenge = get_challenge(ctx, challenge_key)
-    if challenge['state'] == 'OPEN':
-        submissions = challenge['submissions']
-        if contains(submissions, submission_key):
-            Log("Submission already exists.")
-            return False
-        elif len(submissions)<100:
-            Log("Adding new submission.")
-            submissions.append(submission_key)
-            challenge['submissions'] = submissions
-            put(ctx, challenge_key, challenge)
-            return True
-        elif GetTime() > challenge['timestamp'] + 1209600:
-            Log("This challenge has expired.")
-            challenge['state'] = 'CLOSED'
-            put(ctx, challenge_key, challenge)
-            return False
+    # V16
+    if challenge:
+        if challenge['state'] == 'OPEN':
+            submissions = challenge['submissions']
+            if contains(submissions, submission_key):
+                Log("Submission already exists.")
+                return False
+            elif len(submissions)<100:
+                Log("Adding new submission.")
+                submissions.append(submission_key)
+                challenge['submissions'] = submissions
+                # V19
+                set_challenge(ctx, challenge_key, challenge)
+                return True
+            elif GetTime() > challenge['timestamp'] + 1209600:
+                Log("This challenge has expired.")
+                challenge['state'] = 'CLOSED'
+                # V19
+                set_challenge(ctx, challenge_key, challenge)
+                return False
+            else:
+                Log("The maximum number of submissions for this challenge has been reached.")
+                challenge['state'] = 'CLOSED'
+                # V19
+                set_challenge(ctx, challenge_key, challenge)
+                return False
         else:
-            Log("The maximum number of submissions for this challenge has been reached.")
-            challenge['state'] = 'CLOSED'
-            put(ctx, challenge_key, challenge)
             return False
-    else:
-        return False
+    Log("This challenge does not exist.")
+    return False
 
 def close_challenge(ctx, owner, challenge_id):
     challenge_key = generate_challenge_key(owner, challenge_id)
     challenge = get_challenge(ctx, challenge_key)
-    if challenge['state'] != 'CLOSED':
-        challenge['state'] = 'CLOSED'
-        put(ctx, challenge_key, challenge)
-        Log("Challenge closed.")
-    return True
+    # V16
+    if challenge:
+        if challenge['state'] != 'CLOSED':
+            challenge['state'] = 'CLOSED'
+            # V19
+            set_challenge(ctx, challenge_key, challenge)
+            Log("Challenge closed.")
+        return True
+    Log("This challenge does not exist.")
+    return False
 
 def is_challenge_closed(ctx, owner, challenge_id):
     challenge_key = generate_challenge_key(owner, challenge_id)
     challenge = get_challenge(ctx, challenge_key)
-    return challenge['state'] == 'CLOSED'
+    # V16
+    if challenge:
+        return challenge['state'] == 'CLOSED'
+    Log("This challenge does not exist.")
+    return False
 
 def is_challenge_open(ctx, owner, challenge_id):
     challenge_key = generate_challenge_key(owner, challenge_id)
     challenge = get_challenge(ctx, challenge_key)
-    return challenge['state'] == 'OPEN'
+    # V16
+    if challenge:
+        return challenge['state'] == 'OPEN'
+    Log("This challenge does not exist.")
+    return False
 
 def submission_number(ctx, owner, challenge_id):
     challenge_key = generate_challenge_key(owner, challenge_id)
     challenge = get_challenge(ctx, challenge_key)
-    return len(challenge['submissions'])
+    # V16
+    if challenge:
+        return len(challenge['submissions'])
+    Log("This challenge does not exist.")
+    return False
 
 def challenge_expiry_date(ctx, owner, challenge_id):
     challenge_key = generate_challenge_key(owner, challenge_id)
     challenge = get_challenge(ctx, challenge_key)
-    return challenge['timestamp'] + 1209600
+    # V16
+    if challenge:
+        return challenge['timestamp'] + 1209600
+    Log("This challenge does not exist.")
+    return False

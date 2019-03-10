@@ -1,5 +1,4 @@
-from boa.interop.System.ExecutionEngine import GetScriptContainer, GetExecutingScriptHash, GetCallingScriptHash
-from boa.interop.Neo.Runtime import CheckWitness, Notify, Log
+from boa.interop.Neo.Runtime import CheckWitness, Log
 from boa.interop.Neo.Action import RegisterAction
 from boa.interop.Neo.Storage import *
 from boa.builtins import concat
@@ -9,6 +8,7 @@ from nodis.token import *
 from nodis.nep5 import do_transfer_from
 from nodis.challenge.challenge import create_challenge, submit, close_challenge, check_challenge_package, buy_challenge_package, is_challenge_closed, is_challenge_open, submission_number, challenge_expiry_date
 from nodis.submission.submission import create_submission, approve, reject, promoter_fund_claim, rejecter_fund_claim, submission_approver_number, submission_rejecter_number, submission_expiry_date
+from utils import valid_address #V8
 
 
 OnTransfer = RegisterAction('transfer', 'addr_from', 'addr_to', 'amount')
@@ -37,25 +37,37 @@ def handle_mining(ctx, operation, args):
     Log(operation)
 
     if operation == 'register_business':
-        address = args[0]
-        if CheckWitness(TOKEN_OWNER):
-            status = register(ctx, address)
-            return status
-        else:
-            return False
+        # V16
+        if len(args) == 1:
+            address = args[0]
+            if CheckWitness(TOKEN_OWNER):
+                status = register(ctx, address)
+                return status
+            else:
+                return False
 
     if operation == 'check_business':
-        address = args[0]
-        status = check(ctx, address)
-        return status
+        # V16
+        if len(args) == 1:        
+            address = args[0]
+            #V8
+            if not valid_address(address):
+                return False
+            status = check(ctx, address)    
+            return status
 
     if operation == 'signout_business':
-        address = args[0]
-        if CheckWitness(TOKEN_OWNER):
-            status = signout(ctx, address)
-            return status
-        else:
-            return False
+        # V16
+        if len(args) == 1:
+            address = args[0]
+            #V8
+            if not valid_address(address):
+                return False
+            if CheckWitness(TOKEN_OWNER):
+                status = signout(ctx, address)
+                return status
+            else:
+                return False
 
     if operation == 'challenge_reserve':
         return Get(ctx, CHALLENGE_SYSTEM_RESERVE)
@@ -69,179 +81,334 @@ def handle_mining(ctx, operation, args):
         return rate
 
     if operation == 'get_approver_mining_rate':
-        rate = get_approver_mining_rate(ctx, args[0])
-        return rate
+        # V16
+        if len(args) == 1:
+            if args[0] > 0:          
+                rate = get_approver_mining_rate(ctx, args[0])
+                return rate
 
     if operation == 'get_rejecter_mining_rate':
-        rate = get_rejecter_mining_rate(ctx, args[0])
-        return rate
+        # V16
+        if len(args) == 1:
+            if args[0] > 0:
+                rate = get_rejecter_mining_rate(ctx, args[0])
+                return rate
 
     if operation == 'check_challenge_package':
-        owner = args[0]
-        Log("Checking challenge package.")
-        return check_challenge_package(ctx, owner)
+        # V16
+        if len(args) == 1:
+            owner = args[0]
+            #V8
+            if not valid_address(owner):
+                return False
+            Log("Checking challenge package.")
+            return check_challenge_package(ctx, owner)
 
     if operation == 'buy_challenge_package':
-        business = args[0]
-        number = args[1]
-        if CheckWitness(TOKEN_OWNER):
-            Log("Adding challenges to the business package.")
-            return buy_challenge_package(ctx, business, number)
-        else:
-            return False
+        # V16
+        if len(args) == 2:
+            business = args[0]
+            number = args[1]
+            #V8
+            if not valid_address(business):
+                return False
+            if CheckWitness(TOKEN_OWNER):
+                Log("Adding challenges to the business package.")
+                return buy_challenge_package(ctx, business, number)
+            else:
+                return False
 
     if operation == 'create_challenge':
-        owner = args[0]
-        challenge_id = args[1]
-        if CheckWitness(owner) and check(ctx, owner):
-            Log("Creating challenge.")
-            return create_challenge(ctx, owner, challenge_id)
-        else:
-            return False
+        # V16
+        if len(args) == 2:
+            owner = args[0]
+            challenge_id = args[1]
+            #V8
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            if CheckWitness(owner) and check(ctx, owner):
+                Log("Creating challenge.")
+                return create_challenge(ctx, owner, challenge_id)
+            else:
+                return False
 
     if operation == 'close_challenge':
-        owner = args[0]
-        challenge_id = args[1]
-        if CheckWitness(args[0]) and check(ctx, owner):
-            return close_challenge(ctx, owner, challenge_id)
-        else:
-            return False
+        # V16
+        if len(args) == 2:
+            owner = args[0]
+            challenge_id = args[1]
+            #V8
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            if CheckWitness(args[0]) and check(ctx, owner):
+                return close_challenge(ctx, owner, challenge_id)
+            else:
+                return False
 
     if operation == 'is_challenge_closed':
-        owner = args[0]
-        challenge_id = args[1]
-        return is_challenge_closed(ctx, owner, challenge_id)
+        # V16
+        if len(args) == 2:
+            owner = args[0]
+            challenge_id = args[1]
+            #V8
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            return is_challenge_closed(ctx, owner, challenge_id)
     
     if operation == 'is_challenge_open':
-        owner = args[0]
-        challenge_id = args[1]
-        return is_challenge_open(ctx, owner, challenge_id)
+        # V16
+        if len(args) == 2:
+            owner = args[0]
+            challenge_id = args[1]
+            #V8
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            return is_challenge_open(ctx, owner, challenge_id)
 
     if operation == 'submission_number':
-        owner = args[0]
-        challenge_id = args[1]
-        return submission_number(ctx, owner, challenge_id)
+        # V16
+        if len(args) == 2:
+            owner = args[0]
+            challenge_id = args[1]
+            #V8
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            return submission_number(ctx, owner, challenge_id)
 
     if operation == 'challenge_expiry_date':
-        owner = args[0]
-        challenge_id = args[1]
-        return challenge_expiry_date(ctx, owner, challenge_id)
+        # V16
+        if len(args) == 2:
+            owner = args[0]
+            challenge_id = args[1]
+            #V8
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            return challenge_expiry_date(ctx, owner, challenge_id)
 
     if operation == 'submit':
-        if CheckWitness(args[0]):
+        # V16
+        if len(args) == 3:
+            challenger = args[0]
+            #V8
+            if not valid_address(challenger):
+                return False
+            if CheckWitness(challenger):
+                owner = args[1]
+                #V8
+                if not valid_address(owner):
+                    return False
+                challenge_id = args[2]
+                if len(challenge_id) < 1:
+                    return False
+                Log("Creating submission.")
+                status = create_submission(ctx, challenger, owner, challenge_id)
+                return status
+            else:
+                return False
+
+    if operation == 'submission_approver_number':
+        # V16
+        if len(args) == 3:
             challenger = args[0]
             owner = args[1]
             challenge_id = args[2]
-            Log("Creating submission.")
-            status = create_submission(ctx, challenger, owner, challenge_id)
-            return status
-        else:
-            return False
-
-    if operation == 'submission_approver_number':
-        challenger = args[0]
-        owner = args[1]
-        challenge_id = args[2]
-        return submission_approver_number(ctx, challenger, owner, challenge_id)
+            if not valid_address(challenger):
+                return False
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            return submission_approver_number(ctx, challenger, owner, challenge_id)
 
     if operation == 'submission_rejecter_number':
-        challenger = args[0]
-        owner = args[1]
-        challenge_id = args[2]
-        return submission_rejecter_number(ctx, challenger, owner, challenge_id)
+        # V16
+        if len(args) == 3:
+            challenger = args[0]
+            owner = args[1]
+            challenge_id = args[2]
+            #V8
+            if not valid_address(challenger):
+                return False
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            return submission_rejecter_number(ctx, challenger, owner, challenge_id)
 
     if operation == 'submission_expiry_date':
-        challenger = args[0]
-        owner = args[1]
-        challenge_id = args[2]
-        return submission_expiry_date(ctx, challenger, owner, challenge_id)
+        # V16
+        if len(args) == 3:
+            challenger = args[0]
+            owner = args[1]
+            challenge_id = args[2]
+            #V8
+            if not valid_address(challenger):
+                return False
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            return submission_expiry_date(ctx, challenger, owner, challenge_id)
 
     if operation == 'approve_submission':
-        if CheckWitness(args[0]):
+        # V16
+        if len(args) == 4:
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
-            Log("Approving submission.")
-            status = approve(ctx, voter, challenger, owner, challenge_id)
-            return status
+            #V8
+            if not valid_address(voter):
+                return False
+            if not valid_address(challenger):
+                return False
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            if CheckWitness(voter):
+                Log("Approving submission.")
+                status = approve(ctx, voter, challenger, owner, challenge_id)
+                return status
         else:
             return False
 
     if operation == 'reject_submission':
-        if CheckWitness(args[0]):
+        # V16
+        if len(args) == 4:
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
-            Log("Rejecting submission.")
-            status = reject(ctx, voter, challenger, owner, challenge_id)
-            return status
+            #V8
+            if not valid_address(voter):
+                return False
+            if not valid_address(challenger):
+                return False
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            if CheckWitness(voter):
+                Log("Rejecting submission.")
+                status = reject(ctx, voter, challenger, owner, challenge_id)
+                return status
         else:
             return False
 
     if operation == 'promoter_claim':
-        if CheckWitness(args[0]):
-            print("Claiming rewards for promoter.")
+        # V16
+        if len(args) == 3:
             challenger = args[0]
             owner = args[1]
             challenge_id = args[2]
-            is_approved = promoter_fund_claim(ctx, challenger, owner, challenge_id)
-            if is_approved:
-                print("Promoter is approved for a claim.")
-                amount = get_promoter_mining_rate(ctx)
-                claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, challenger, amount)
-                return True
+            #V8
+            if not valid_address(challenger):
+                return False
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            if CheckWitness(challenger):
+                print("Claiming rewards for promoter.")
+                is_approved = promoter_fund_claim(ctx, challenger, owner, challenge_id)
+                if is_approved:
+                    print("Promoter is approved for a claim.")
+                    amount = get_promoter_mining_rate(ctx)
+                    claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, challenger, amount)
+                    return True
+                else:
+                    print("Promoter is not approved for a claim.")
+                    return False   
             else:
-                print("Promoter is not approved for a claim.")
-                return False   
-        else:
-            return False
+                return False
 
     if operation == 'approver_claim':
-        if CheckWitness(args[0]):
-            print("Claiming rewards for voter.")
+        # V16
+        if len(args) == 4:
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
-            has_approved = approver_fund_claim(ctx, voter, challenger, owner, challenge_id)
-            if has_approved != False:
-                print("Voter is approved for a claim.")
-                amount = get_approver_mining_rate(ctx, has_approved)
-                claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, voter, amount)
-                return True
+            #V8
+            if not valid_address(voter):
+                return False
+            if not valid_address(challenger):
+                return False
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            if CheckWitness(voter):
+                print("Claiming rewards for voter.")
+                has_approved = approver_fund_claim(ctx, voter, challenger, owner, challenge_id)
+                if has_approved != False:
+                    print("Voter is approved for a claim.")
+                    amount = get_approver_mining_rate(ctx, has_approved)
+                    claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, voter, amount)
+                    return True
+                else:
+                    print("Voter is not approved for a claim.")
+                    return False    
             else:
-                print("Voter is not approved for a claim.")
-                return False    
-        else:
-            return False
+                return False
 
     if operation == 'rejecter_claim':
-        if CheckWitness(args[0]):
-            print("Claiming rewards for voter.")
+        # V16
+        if len(args) == 4:
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
-            has_rejected = rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id)
-            if has_rejected != False:
-                print("Voter is approved for a claim.")
-                amount = get_rejecter_mining_rate(ctx, has_rejected)
-                claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, voter, amount)
-                return True
+            #V8
+            if not valid_address(voter):
+                return False
+            if not valid_address(challenger):
+                return False
+            if not valid_address(owner):
+                return False
+            if len(challenge_id) < 1:
+                return False
+            if CheckWitness(voter):
+                print("Claiming rewards for voter.")
+                has_rejected = rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id)
+                if has_rejected != False:
+                    print("Voter is approved for a claim.")
+                    amount = get_rejecter_mining_rate(ctx, has_rejected)
+                    claim_funds(ctx, CHALLENGE_SYSTEM_RESERVE, voter, amount)
+                    return True
+                else:
+                    print("Voter is not approved for a claim.")
+                    return False 
             else:
-                print("Voter is not approved for a claim.")
-                return False 
-        else:
-            return False
+                return False
 
     if operation == 'load_challenge_reserve':
-        return load_challenge_reserve(ctx, args[0])
+        # V16
+        if len(args) == 1:
+            amount = args[0]
+            return load_challenge_reserve(ctx, amount)
 
     return False
 
 def claim_funds(ctx, t_from, t_to, amount):
+
+    #V3 & V8
+    if not valid_address(t_to):
+        return False
+
     print("Claiming Funds.")
     print(amount)
     if amount <= 0:
@@ -271,7 +438,7 @@ def load_challenge_reserve(ctx, amount):
         return False
 
     owner_balance = Get(ctx, TOKEN_OWNER)
-    if balance < amount:
+    if owner_balance < amount:
         print("The owner does not have enough balance.")
         return False
 

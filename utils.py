@@ -30,3 +30,7 @@ def contains(array, element):
             return result
         i += 1
     return False
+
+#V8
+def valid_address(address):
+    return len(address) == 20

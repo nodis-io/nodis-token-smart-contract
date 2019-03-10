@@ -8,23 +8,23 @@
 <p align="center">The official Python NODIS Smart Contract.</p>
 <hr/>
 
-#Description
+# Description
 
 This contract has been designed and developed by the NODIS team. It will serve during the token sales and throughout the entire duration of the NODIS project.
 
 #Commands
 
-##Token Sale / ICO
+## Token Sale / ICO
 
 `sc invoke <contract address> crowdsale_status ["<wallet address>"]` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
 `sc invoke <contract hash> mintTokens [] --attach-gas={number}` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-##Transferring NODIS tokens
+## Transferring NODIS tokens
 
 `sc invoke <contract address> transfer ["<owner address>", "<destination address>", 500]` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-##Mining Rate
+## Mining Rate
 
 `sc invoke <contract hash> get_mining_rate []` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
@@ -37,7 +37,7 @@ This contract has been designed and developed by the NODIS team. It will serve d
 `sc invoke <contract address> transfer ["<admin address>", "b'CHALLENGE_SYSTEM_RESERVE'", 500]` <span style="color:BlueViolet;border-color:BlueViolet;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">ADMIN</span>
 
 
-##Challenge System 
+## Challenge System 
 
 `sc invoke <contract address> register_business ["<business address>"]` <span style="color:BlueViolet;border-color:BlueViolet;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">ADMIN</span>
 
@@ -54,14 +54,14 @@ This contract has been designed and developed by the NODIS team. It will serve d
 `sc invoke <contract address> close_challenge ["<Alice's address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span> <span style="color:DarkSlateGrey;border-color:DarkSlateGrey;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">BUSINESS</span>
 
 
-##Challenge Package
+## Challenge Package
 
 `sc invoke <contract hash> buy_challenge_package ["<alice_address>", 2]` <span style="color:BlueViolet;border-color:BlueViolet;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">ADMIN</span> <span style="color:DarkSlateGrey;border-color:DarkSlateGrey;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">BUSINESS</span>
 
 `sc invoke <contract hash> check_challenge_package ["<alice_address>"]` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
 
-##Claims 
+## Claims 
 `sc invoke <contract hash> promoter_claim ["<bob_address>", "<alice_address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
 `sc invoke <contract hash> approver_claim ["<david_address>", "<bob_address>", "<alice_address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
@@ -72,7 +72,7 @@ This contract has been designed and developed by the NODIS team. It will serve d
 
 ##NODIS _GET_ Functions
 
-###Challenge Getter
+### Challenge Getter
 
 `sc invoke <smart contract> is_challenge_open ["<alice_address>", 'challenge-number-1']`
 `sc invoke <smart contract> is_challenge_closed ["<alice_address>", 'challenge-number-1']`
@@ -95,12 +95,11 @@ This contract has been designed and developed by the NODIS team. It will serve d
 
 # Audit
 
-This contract was audited by Red4Sec CyberSecurity S.L.
+This contract was audited by **Red4Sec CyberSecurity S.L**.
 
 <p align="center">
   <img
     src="https://red4sec.com/images/logo.png"
-    width="125px;">
-<p align="center"><a href="https://red4sec.com/en">Website</a></p>
-    
+    href="https://red4sec.com/en"
+    width="125px;">  
 </p>

@@ -51,7 +51,7 @@ def Main(operation, args):
         attachments = get_asset_attachments()
 
         #V1
-        if attachments[5]:
+        if attachments[4]:
             return False
 
         return can_exchange(ctx, attachments, True)

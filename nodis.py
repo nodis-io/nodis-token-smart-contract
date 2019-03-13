@@ -2,10 +2,10 @@
 NODIS Token Smart Contract
 ===================================
 
-Authors: Nathan Mukena & Dominic Fung
-Emails: nathan.mukena@nodis.io & dominic.fung@nodis.io
+Authors: Nathan Mukena
+Emails: nathan.mukena@nodis.io
 
-Date: March 15 2019
+Date: March 15, 2019
 
 """
 from nodis.txio import get_asset_attachments

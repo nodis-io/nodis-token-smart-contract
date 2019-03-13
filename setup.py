@@ -28,8 +28,8 @@ setup(
     url='https://nodis.io/',
 
     # Authors details
-    author='Nathan Mukena & Dominic Fung',
-    author_email='nathan.mukena@nodis.io & dominic.fung@nodis.io',
+    author='Nathan Mukena',
+    author_email='nathan.mukena@nodis.io',
 
     # Choose your license
     license='GPL3',

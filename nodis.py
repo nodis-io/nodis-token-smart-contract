@@ -16,12 +16,16 @@ from nodis.mining import handle_mining
 from boa.interop.Neo.Runtime import GetTrigger, CheckWitness, Log, Notify, GetTime
 from boa.interop.Neo.TriggerType import Application, Verification
 from boa.interop.Neo.Storage import *
-from boa.interop.Neo.Blockchain import Migrate, Destroy
+from boa.interop.Neo.Blockchain import Migrate, Destroy, GetAccount
+from boa.interop.System.ExecutionEngine import GetExecutingScriptHash
+from boa.interop.Neo.Account import GetBalance
 
 ctx = GetContext()
 NEP5_METHODS = ['name', 'symbol', 'decimals', 'totalSupply', 'balanceOf', 'transfer', 'transferFrom', 'approve', 'allowance']
 MINING_METHODS = ['register_business', 'check_business', 'signout_business', 'create_challenge', 'close_challenge', 'submit', 'approve_submission', 'reject_submission', 'promoter_claim', 'approver_claim', 'rejecter_claim', 'get_mining_rate', 'get_promoter_mining_rate', 'get_approver_mining_rate', 'get_rejecter_mining_rate', 'check_challenge_package', 'buy_challenge_package', 'challenge_reserve', 'load_challenge_reserve', 'is_challenge_closed', 'is_challenge_open', 'submission_number', 'challenge_expiry_date', 'submission_approver_number', 'submission_rejecter_number', 'submission_expiry_date']
 
+NEO = b'\x9b|\xff\xda\xa6t\xbe\xae\x0f\x93\x0e\xbe`\x85\xaf\x90\x93\xe5\xfeV\xb3J\\"\x0c\xcd\xcfn\xfc3o\xc5'
+GAS = b'\xe7-(iy\xeel\xb1\xb7\xe6]\xfd\xdf\xb2\xe3\x84\x10\x0b\x8d\x14\x8ewX\xdeB\xe4\x16\x8bqy,`'
 
 def Main(operation, args):
     """
@@ -40,7 +44,8 @@ def Main(operation, args):
     if trigger == Verification():
 
         # check if the invoker is the owner of this contract
-        is_owner = CheckWitness(TOKEN_OWNER)
+        # V10
+        is_owner = CheckWitness(get_owner_address(ctx))
 
         # If owner, proceed
         if is_owner:
@@ -98,19 +103,51 @@ def Main(operation, args):
 
         elif operation == 'migrate':
             #V11
-            if len(args) != 8:
+            if len(args) != 9:
                 return False
-            if not CheckWitness(TOKEN_OWNER):
+            if not CheckWitness(get_owner_address(ctx)):
                 return False
-            Migrate(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7])
+            account = GetAccount(GetExecutingScriptHash())
+            neo_balance = GetBalance(account, NEO)
+            gas_balance = GetBalance(account, GAS)
+            if neo_balance > 0:
+                print("Cannot migrate yet.  Please transfer all neo/gas and tokens from contract address")
+                return False
+            if gas_balance > 0:
+                print("Cannot migrate yet.  Please transfer all neo/gas and tokens from contract address")
+                return False
+            Migrate(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
             return True
 
         elif operation == 'destroy':
             #V11
-            if not CheckWitness(TOKEN_OWNER):   
+            if not CheckWitness(get_owner_address(ctx)):   
+                return False
+            account = GetAccount(GetExecutingScriptHash())
+            neo_balance = GetBalance(account, NEO)
+            gas_balance = GetBalance(account, GAS)
+            if neo_balance > 0:
+                print("Cannot migrate yet.  Please transfer all neo/gas and tokens from contract address")
+                return False
+            if gas_balance > 0:
+                print("Cannot migrate yet.  Please transfer all neo/gas and tokens from contract address")
                 return False
             Destroy()
             return True
+        
+        #V10
+        elif operation == 'change_owner':
+            #V10
+            if not CheckWitness(get_owner_address(ctx)):   
+                return False
+            #V11
+            if len(args) != 1:
+                return False
+            # V13
+            if not valid_address(args[0]):
+                return False
+            new_address = args[0]
+            return set_owner_address(ctx, new_address)
 
         return 'unknown operation'
 
@@ -123,7 +160,11 @@ def deploy():
     :return:
         bool: Whether the operation was successful
     """
-    if not CheckWitness(TOKEN_OWNER):
+    #V10
+    owner_initial_address = b'\xcca\xe4\xaa\x9eS\x13.\xb1o\x10}\xf6|\x01\x06\x1f\x8b\xa2K'
+    set_owner_address(ctx, owner_initial_address)
+
+    if not CheckWitness(get_owner_address(ctx)):
         print("Must be owner to deploy")
         return False
 
@@ -132,7 +173,7 @@ def deploy():
         Put(ctx, 'initialized', 1)
 
         # Allocate owner balance of 41 m
-        Put(ctx, TOKEN_OWNER, TOKEN_OWNER_AMOUNT)
+        Put(ctx, get_owner_address(ctx), TOKEN_OWNER_AMOUNT)
 
         # Allocate Challenge Reserve balance
         Put(ctx, CHALLENGE_SYSTEM_RESERVE, CHALLENGE_SYSTEM_INITIAL_AMOUNT)
@@ -153,7 +194,7 @@ def reallocate():
     :return:
         bool: Whether the operation was successful
     """
-    if not CheckWitness(TOKEN_OWNER):
+    if not CheckWitness(get_owner_address(ctx)):
         print("Must be owner to reallocate")
         return False
 
@@ -163,13 +204,13 @@ def reallocate():
         print("Must wait until the end of Series A before re-allocating.")
         return False
 
-    current_balance = Get(ctx, TOKEN_OWNER)
+    current_balance = Get(ctx, get_owner_address(ctx))
 
     crowdsale_available = crowdsale_available_amount(ctx)
 
     new_balance = current_balance + crowdsale_available
 
-    Put(ctx, TOKEN_OWNER, new_balance)
+    Put(ctx, get_owner_address(ctx), new_balance)
 
     Log("Reallocated successfully!")
 

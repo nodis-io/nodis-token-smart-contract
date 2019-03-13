@@ -33,4 +33,6 @@ def contains(array, element):
 
 #V8
 def valid_address(address):
+    if address == 0:
+        return False
     return len(address) == 20

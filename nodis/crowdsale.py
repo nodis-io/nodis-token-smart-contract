@@ -27,7 +27,7 @@ def kyc_register(ctx, args):
     """
     ok_count = 0
 
-    if CheckWitness(TOKEN_OWNER):
+    if CheckWitness(get_owner_address(ctx)):
 
         for address in args:
 

@@ -4,15 +4,13 @@ Basic settings for an NEP5 Token and crowdsale
 
 from boa.interop.Neo.Storage import *
 from boa.interop.Neo.Runtime import CheckWitness, Notify, Log
+from boa.interop.Neo.Storage import *
 
 TOKEN_NAME = 'Nodis Token'
 
 TOKEN_SYMBOL = 'NODIS'
 
 TOKEN_DECIMALS = 8
-
-# This is the script hash of the address for the owner of the token
-TOKEN_OWNER = b'\xcca\xe4\xaa\x9eS\x13.\xb1o\x10}\xf6|\x01\x06\x1f\x8b\xa2K'
 
 # Address of the challenge reserve
 CHALLENGE_SYSTEM_RESERVE = b'CHALLENGE_SYSTEM_RESERVE'
@@ -42,6 +40,27 @@ KYC_KEY = b'kyc_ok'
 
 SERIES_A_KEY = b'r1'
     
+#V10
+def get_owner_address(ctx):
+    """
+    Get the current owner address.
+
+    :return: 
+        bytearray: The current owner address.
+    """
+    address = Get(ctx, b'OWNER')
+    return address
+
+#V10
+def set_owner_address(ctx, new_address):
+    """
+    Set the current owner address.
+
+    :return: 
+        bytearray: The current owner address.
+    """
+    Put(ctx, b'OWNER', new_address)
+    return True
 
 def crowdsale_available_amount(ctx):
     """

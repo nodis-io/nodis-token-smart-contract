@@ -40,7 +40,10 @@ def handle_mining(ctx, operation, args):
         # V16
         if len(args) == 1:
             address = args[0]
-            if CheckWitness(TOKEN_OWNER):
+            #V8
+            if not valid_address(address):
+                return False
+            if CheckWitness(get_owner_address(ctx)):
                 status = register(ctx, address)
                 return status
             else:
@@ -63,7 +66,7 @@ def handle_mining(ctx, operation, args):
             #V8
             if not valid_address(address):
                 return False
-            if CheckWitness(TOKEN_OWNER):
+            if CheckWitness(get_owner_address(ctx)):
                 status = signout(ctx, address)
                 return status
             else:
@@ -112,7 +115,7 @@ def handle_mining(ctx, operation, args):
             #V8
             if not valid_address(business):
                 return False
-            if CheckWitness(TOKEN_OWNER):
+            if CheckWitness(get_owner_address(ctx)):
                 Log("Adding challenges to the business package.")
                 return buy_challenge_package(ctx, business, number)
             else:
@@ -429,7 +432,7 @@ def claim_funds(ctx, t_from, t_to, amount):
     return True
 
 def load_challenge_reserve(ctx, amount):
-    if not CheckWitness(TOKEN_OWNER):
+    if not CheckWitness(get_owner_address(ctx)):
         print("Needs to be the token owner.")
         return False
 
@@ -437,7 +440,7 @@ def load_challenge_reserve(ctx, amount):
         print("Negative amount.")
         return False
 
-    owner_balance = Get(ctx, TOKEN_OWNER)
+    owner_balance = Get(ctx, get_owner_address(ctx))
     if owner_balance < amount:
         print("The owner does not have enough balance.")
         return False
@@ -450,7 +453,7 @@ def load_challenge_reserve(ctx, amount):
     print("Adding funds to the challenge reserve.")
 
     new_balance = owner_balance - amount
-    Put(ctx, TOKEN_OWNER, new_balance)
+    Put(ctx, get_owner_address(ctx), new_balance)
 
     new_challenge_reserve = current_challenge_reserve + amount
     Put(ctx, CHALLENGE_SYSTEM_RESERVE, new_challenge_reserve)

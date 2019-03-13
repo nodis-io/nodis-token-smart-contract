@@ -160,15 +160,17 @@ def deploy():
     :return:
         bool: Whether the operation was successful
     """
-    #V10
-    owner_initial_address = b'\xcca\xe4\xaa\x9eS\x13.\xb1o\x10}\xf6|\x01\x06\x1f\x8b\xa2K'
-    set_owner_address(ctx, owner_initial_address)
-
-    if not CheckWitness(get_owner_address(ctx)):
-        print("Must be owner to deploy")
-        return False
 
     if not Get(ctx, 'initialized'):
+
+        #V10
+        owner_initial_address = b'\xcca\xe4\xaa\x9eS\x13.\xb1o\x10}\xf6|\x01\x06\x1f\x8b\xa2K'
+        set_owner_address(ctx, owner_initial_address)
+
+        if not CheckWitness(get_owner_address(ctx)):
+            print("Must be owner to deploy")
+            return False
+
         # do deploy logic
         Put(ctx, 'initialized', 1)
 

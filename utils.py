@@ -31,7 +31,6 @@ def contains(array, element):
         i += 1
     return False
 
-#V8
 def valid_address(address):
     if address == 0:
         return False

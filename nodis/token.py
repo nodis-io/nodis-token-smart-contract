@@ -30,17 +30,16 @@ TOKENS_PER_GAS_SERIES_A = 905000000
 
 # Series A Token Sale Start Date (Sat, 06 Apr 2019 00:00 AM = 5AM GMT)
 # SERIES_A_START = 1554526800
-SERIES_A_START = 1551398400
+SERIES_A_START = 1552608000
 
 # Series A Token Sale End Date (Thu, 06 Jun 2019 00:00 AM)
 # SERIES_A_END = 1559797200
-SERIES_A_END = 1554854400
+SERIES_A_END = 1562371200
 
 KYC_KEY = b'kyc_ok'
 
 SERIES_A_KEY = b'r1'
     
-#V10
 def get_owner_address(ctx):
     """
     Get the current owner address.
@@ -51,7 +50,6 @@ def get_owner_address(ctx):
     address = Get(ctx, b'OWNER')
     return address
 
-#V10
 def set_owner_address(ctx, new_address):
     """
     Set the current owner address.
@@ -111,7 +109,6 @@ def get_mining_rate(ctx):
     :return:
         int: Current mining rate
     """
-    # V24
 
     current_reserve = Get(ctx, CHALLENGE_SYSTEM_RESERVE)
 
@@ -135,9 +132,7 @@ def get_promoter_mining_rate(ctx):
     """
 
     mining_rate = get_mining_rate(ctx)
-    # V5
     rate = mining_rate / 100
-
     return rate * 80
 
 

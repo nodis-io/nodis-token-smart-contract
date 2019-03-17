@@ -8,7 +8,7 @@ from nodis.token import *
 from nodis.nep5 import do_transfer_from
 from nodis.challenge.challenge import create_challenge, submit, close_challenge, check_challenge_package, buy_challenge_package, is_challenge_closed, is_challenge_open, submission_number, challenge_expiry_date
 from nodis.submission.submission import create_submission, approve, reject, promoter_fund_claim, rejecter_fund_claim, submission_approver_number, submission_rejecter_number, submission_expiry_date
-from utils import valid_address #V8
+from utils import valid_address
 
 
 OnTransfer = RegisterAction('transfer', 'addr_from', 'addr_to', 'amount')
@@ -37,10 +37,8 @@ def handle_mining(ctx, operation, args):
     Log(operation)
 
     if operation == 'register_business':
-        # V16
         if len(args) == 1:
             address = args[0]
-            #V8
             if not valid_address(address):
                 return False
             if CheckWitness(get_owner_address(ctx)):
@@ -50,20 +48,16 @@ def handle_mining(ctx, operation, args):
                 return False
 
     if operation == 'check_business':
-        # V16
         if len(args) == 1:        
             address = args[0]
-            #V8
             if not valid_address(address):
                 return False
             status = check(ctx, address)    
             return status
 
     if operation == 'signout_business':
-        # V16
         if len(args) == 1:
             address = args[0]
-            #V8
             if not valid_address(address):
                 return False
             if CheckWitness(get_owner_address(ctx)):
@@ -84,35 +78,29 @@ def handle_mining(ctx, operation, args):
         return rate
 
     if operation == 'get_approver_mining_rate':
-        # V16
         if len(args) == 1:
             if args[0] > 0:          
                 rate = get_approver_mining_rate(ctx, args[0])
                 return rate
 
     if operation == 'get_rejecter_mining_rate':
-        # V16
         if len(args) == 1:
             if args[0] > 0:
                 rate = get_rejecter_mining_rate(ctx, args[0])
                 return rate
 
     if operation == 'check_challenge_package':
-        # V16
         if len(args) == 1:
             owner = args[0]
-            #V8
             if not valid_address(owner):
                 return False
             Log("Checking challenge package.")
             return check_challenge_package(ctx, owner)
 
     if operation == 'buy_challenge_package':
-        # V16
         if len(args) == 2:
             business = args[0]
             number = args[1]
-            #V8
             if not valid_address(business):
                 return False
             if CheckWitness(get_owner_address(ctx)):
@@ -122,11 +110,9 @@ def handle_mining(ctx, operation, args):
                 return False
 
     if operation == 'create_challenge':
-        # V16
         if len(args) == 2:
             owner = args[0]
             challenge_id = args[1]
-            #V8
             if not valid_address(owner):
                 return False
             if len(challenge_id) < 1:
@@ -138,11 +124,9 @@ def handle_mining(ctx, operation, args):
                 return False
 
     if operation == 'close_challenge':
-        # V16
         if len(args) == 2:
             owner = args[0]
             challenge_id = args[1]
-            #V8
             if not valid_address(owner):
                 return False
             if len(challenge_id) < 1:
@@ -153,11 +137,9 @@ def handle_mining(ctx, operation, args):
                 return False
 
     if operation == 'is_challenge_closed':
-        # V16
         if len(args) == 2:
             owner = args[0]
             challenge_id = args[1]
-            #V8
             if not valid_address(owner):
                 return False
             if len(challenge_id) < 1:
@@ -165,11 +147,9 @@ def handle_mining(ctx, operation, args):
             return is_challenge_closed(ctx, owner, challenge_id)
     
     if operation == 'is_challenge_open':
-        # V16
         if len(args) == 2:
             owner = args[0]
             challenge_id = args[1]
-            #V8
             if not valid_address(owner):
                 return False
             if len(challenge_id) < 1:
@@ -177,11 +157,9 @@ def handle_mining(ctx, operation, args):
             return is_challenge_open(ctx, owner, challenge_id)
 
     if operation == 'submission_number':
-        # V16
         if len(args) == 2:
             owner = args[0]
             challenge_id = args[1]
-            #V8
             if not valid_address(owner):
                 return False
             if len(challenge_id) < 1:
@@ -189,11 +167,9 @@ def handle_mining(ctx, operation, args):
             return submission_number(ctx, owner, challenge_id)
 
     if operation == 'challenge_expiry_date':
-        # V16
         if len(args) == 2:
             owner = args[0]
             challenge_id = args[1]
-            #V8
             if not valid_address(owner):
                 return False
             if len(challenge_id) < 1:
@@ -201,15 +177,12 @@ def handle_mining(ctx, operation, args):
             return challenge_expiry_date(ctx, owner, challenge_id)
 
     if operation == 'submit':
-        # V16
         if len(args) == 3:
             challenger = args[0]
-            #V8
             if not valid_address(challenger):
                 return False
             if CheckWitness(challenger):
                 owner = args[1]
-                #V8
                 if not valid_address(owner):
                     return False
                 challenge_id = args[2]
@@ -222,7 +195,6 @@ def handle_mining(ctx, operation, args):
                 return False
 
     if operation == 'submission_approver_number':
-        # V16
         if len(args) == 3:
             challenger = args[0]
             owner = args[1]
@@ -236,12 +208,10 @@ def handle_mining(ctx, operation, args):
             return submission_approver_number(ctx, challenger, owner, challenge_id)
 
     if operation == 'submission_rejecter_number':
-        # V16
         if len(args) == 3:
             challenger = args[0]
             owner = args[1]
             challenge_id = args[2]
-            #V8
             if not valid_address(challenger):
                 return False
             if not valid_address(owner):
@@ -251,12 +221,10 @@ def handle_mining(ctx, operation, args):
             return submission_rejecter_number(ctx, challenger, owner, challenge_id)
 
     if operation == 'submission_expiry_date':
-        # V16
         if len(args) == 3:
             challenger = args[0]
             owner = args[1]
             challenge_id = args[2]
-            #V8
             if not valid_address(challenger):
                 return False
             if not valid_address(owner):
@@ -266,13 +234,11 @@ def handle_mining(ctx, operation, args):
             return submission_expiry_date(ctx, challenger, owner, challenge_id)
 
     if operation == 'approve_submission':
-        # V16
         if len(args) == 4:
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
-            #V8
             if not valid_address(voter):
                 return False
             if not valid_address(challenger):
@@ -289,13 +255,11 @@ def handle_mining(ctx, operation, args):
             return False
 
     if operation == 'reject_submission':
-        # V16
         if len(args) == 4:
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
-            #V8
             if not valid_address(voter):
                 return False
             if not valid_address(challenger):
@@ -312,12 +276,10 @@ def handle_mining(ctx, operation, args):
             return False
 
     if operation == 'promoter_claim':
-        # V16
         if len(args) == 3:
             challenger = args[0]
             owner = args[1]
             challenge_id = args[2]
-            #V8
             if not valid_address(challenger):
                 return False
             if not valid_address(owner):
@@ -339,13 +301,11 @@ def handle_mining(ctx, operation, args):
                 return False
 
     if operation == 'approver_claim':
-        # V16
         if len(args) == 4:
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
-            #V8
             if not valid_address(voter):
                 return False
             if not valid_address(challenger):
@@ -369,13 +329,11 @@ def handle_mining(ctx, operation, args):
                 return False
 
     if operation == 'rejecter_claim':
-        # V16
         if len(args) == 4:
             voter = args[0]
             challenger = args[1]
             owner = args[2]
             challenge_id = args[3]
-            #V8
             if not valid_address(voter):
                 return False
             if not valid_address(challenger):
@@ -399,7 +357,6 @@ def handle_mining(ctx, operation, args):
                 return False
 
     if operation == 'load_challenge_reserve':
-        # V16
         if len(args) == 1:
             amount = args[0]
             return load_challenge_reserve(ctx, amount)
@@ -408,7 +365,6 @@ def handle_mining(ctx, operation, args):
 
 def claim_funds(ctx, t_from, t_to, amount):
 
-    #V3 & V8
     if not valid_address(t_to):
         return False
 

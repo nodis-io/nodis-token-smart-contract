@@ -44,7 +44,6 @@ def Main(operation, args):
     if trigger == Verification():
 
         # check if the invoker is the owner of this contract
-        # V10
         is_owner = CheckWitness(get_owner_address(ctx))
 
         # If owner, proceed
@@ -55,7 +54,6 @@ def Main(operation, args):
         # If attachments of assets is ok
         attachments = get_asset_attachments()
 
-        #V1
         if attachments[4]:
             return False
 
@@ -97,12 +95,10 @@ def Main(operation, args):
         elif operation == 'get_attachments':
             return get_asset_attachments()
 
-        #V17
         elif operation == 'supportedStandards':
             return ['NEP-5', 'NEP-10']
 
         elif operation == 'migrate':
-            #V11
             if len(args) != 9:
                 return False
             if not CheckWitness(get_owner_address(ctx)):
@@ -120,30 +116,25 @@ def Main(operation, args):
             return True
 
         elif operation == 'destroy':
-            #V11
             if not CheckWitness(get_owner_address(ctx)):   
                 return False
             account = GetAccount(GetExecutingScriptHash())
             neo_balance = GetBalance(account, NEO)
             gas_balance = GetBalance(account, GAS)
             if neo_balance > 0:
-                print("Cannot migrate yet.  Please transfer all neo/gas and tokens from contract address")
+                print("Cannot destroy yet.  Please transfer all neo/gas and tokens from contract address")
                 return False
             if gas_balance > 0:
-                print("Cannot migrate yet.  Please transfer all neo/gas and tokens from contract address")
+                print("Cannot destroy yet.  Please transfer all neo/gas and tokens from contract address")
                 return False
             Destroy()
             return True
         
-        #V10
         elif operation == 'change_owner':
-            #V10
             if not CheckWitness(get_owner_address(ctx)):   
                 return False
-            #V11
             if len(args) != 1:
                 return False
-            # V13
             if not valid_address(args[0]):
                 return False
             new_address = args[0]
@@ -163,8 +154,7 @@ def deploy():
 
     if not Get(ctx, 'initialized'):
 
-        #V10
-        owner_initial_address = b'\xcca\xe4\xaa\x9eS\x13.\xb1o\x10}\xf6|\x01\x06\x1f\x8b\xa2K'
+        owner_initial_address = b'\x9e\x9a\\\xfd\xb5\x18\xb83\x89e\xf4\x94\xb2\x15u\x0eh\xc2,\xa7'
         set_owner_address(ctx, owner_initial_address)
 
         if not CheckWitness(get_owner_address(ctx)):
@@ -216,5 +206,4 @@ def reallocate():
 
     Log("Reallocated successfully!")
 
-    # V14
     return add_to_circulation(ctx, crowdsale_available)

@@ -3,7 +3,6 @@ from boa.interop.Neo.Runtime import Notify, Serialize, Deserialize, Log, GetTime
 from utils import concat_bytes, contains
 from nodis.challenge.challenge import submit, get_challenge, is_challenge_closed, generate_challenge_key
 
-# V19
 def set_submission(ctx, submission_key, submission):
     to_save = Serialize(submission)
     Put(ctx, submission_key, to_save)
@@ -18,7 +17,6 @@ def get_submission(ctx, submission_key):
 
 def generate_submission_key(challenger, owner, challenge_id):
     challenge_key = generate_challenge_key(owner, challenge_id)
-    # V21
     key = concat_bytes(['S{U=',challenger,'&K=',challenge_key,'}'])
     return key
 
@@ -45,7 +43,6 @@ def create_submission(ctx, challenger, owner, challenge_id):
     status = submit(ctx, challenge_key, submission_key)
     if status:
         Log("Storing submission.")
-        # V19
         set_submission(ctx, submission_key, submission)
         return submission_key
     else:
@@ -56,7 +53,6 @@ def approve(ctx, voter, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
     submission = get_submission(ctx, submission_key)
-    #V16
     if submission:
         if GetTime() < submission['timestamp'] + 87000:
             voters = submission['voters']
@@ -76,7 +72,6 @@ def approve(ctx, voter, challenger, owner, challenge_id):
                     submission['status'] = 'APPROVED'
                 elif submission['difference'] < 0:
                     submission['status'] = 'REJECTED'
-                # V19
                 set_submission(ctx, submission_key, submission)
                 return True
             else:
@@ -85,7 +80,6 @@ def approve(ctx, voter, challenger, owner, challenge_id):
         else:
             Log("This submission has expired.")
             submission['state'] = 'CLOSED'
-            # V19
             set_submission(ctx, submission_key, submission)
             return False
     else:
@@ -96,7 +90,6 @@ def reject(ctx, voter, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
     submission = get_submission(ctx, submission_key)
-    #V16
     if submission:
         if GetTime() < submission['timestamp'] + 87000:
             voters = submission['voters']
@@ -116,7 +109,6 @@ def reject(ctx, voter, challenger, owner, challenge_id):
                     submission['status'] = 'APPROVED'
                 elif submission['difference'] < 0:
                     submission['status'] = 'REJECTED'
-                # V19
                 set_submission(ctx, submission_key, submission)
                 return True
             else:
@@ -125,7 +117,6 @@ def reject(ctx, voter, challenger, owner, challenge_id):
         else:
             Log("This submission has expired.")
             submission['state'] = 'CLOSED'
-            # V19
             set_submission(ctx, submission_key, submission)
             return False
     else:
@@ -137,7 +128,6 @@ def promoter_fund_claim(ctx, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
     submission = get_submission(ctx, submission_key)
-    #V16
     if submission:
         if GetTime() >= submission['timestamp'] + 87000:
             Log("Submission is closed.")
@@ -147,7 +137,6 @@ def promoter_fund_claim(ctx, challenger, owner, challenge_id):
                 if submission['claimed'] == 'NO':
                     Log("Reward has not been claimed. Mining...")
                     submission['claimed'] = 'YES'
-                    # V19
                     set_submission(ctx, submission_key, submission)
                     return True
                 else:
@@ -167,7 +156,6 @@ def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
     submission = get_submission(ctx, submission_key)
-    #V16
     if submission:
         if GetTime() >= submission['timestamp'] + 87000:
             Log("Submission is closed.")
@@ -179,7 +167,6 @@ def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
                     Log("Submission was rejected. Voter is eligible for claim.")
                     rejecters.remove(rejecter[voter])
                     submission['rejecters'] = rejecters
-                    # V19
                     set_submission(ctx, submission_key, submission)
                     Log("Voter has been removed from the rejecter list. Claim can proceed.")
                     return submission['rejecter_count']
@@ -200,7 +187,6 @@ def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     Log("Generating submission key.")
     submission = get_submission(ctx, submission_key)
-    #V16
     if submission:
         if GetTime() >= submission['timestamp'] + 87000:
             Log("Submission is closed.")
@@ -212,7 +198,6 @@ def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
                     Log("Submission was approved. Voter is eligible for claim.")
                     approvers.remove(approver[voter])
                     submission['approvers'] = approvers
-                    # V19
                     set_submission(ctx, submission_key, submission)
                     Log("Voter has been removed from the approver list. Claim can proceed.")
                     return submission['approver_count']
@@ -232,7 +217,6 @@ def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
 def submission_approver_number(ctx, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     submission = get_submission(ctx, submission_key)
-    #V16
     if submission:
         return submission['approver_count']
     return False
@@ -240,7 +224,6 @@ def submission_approver_number(ctx, challenger, owner, challenge_id):
 def submission_rejecter_number(ctx, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     submission = get_submission(ctx, submission_key)
-    #V16
     if submission:
         return submission['rejecter_count']
     return False
@@ -248,7 +231,6 @@ def submission_rejecter_number(ctx, challenger, owner, challenge_id):
 def submission_expiry_date(ctx, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     submission = get_submission(ctx, submission_key)
-    #V16
     if submission:
         return submission['timestamp'] + 86400
     return False

@@ -11,7 +11,7 @@ from utils import valid_address
 
 OnKYCRegister = RegisterAction('kyc_registration', 'address')
 OnTransfer = RegisterAction('transfer', 'addr_from', 'addr_to', 'amount')
-OnRefund = RegisterAction('refund', 'addr_to', 'amount', 'asset') # V7
+OnRefund = RegisterAction('refund', 'addr_to', 'amount', 'asset')
 
 time = GetTime()
 
@@ -53,7 +53,6 @@ def kyc_status(ctx, args):
 
     if len(args) > 0:
         addr = args[0]
-        #V8
         if not valid_address(addr):
             return False
         kyc_storage_key = concat(KYC_KEY, addr)
@@ -71,7 +70,6 @@ def perform_exchange(ctx):
          bool: Whether the exchange was successful
      """
 
-    # V2
     last_tx = Get(ctx, LAST_TX_KEY)
     current_tx = GetScriptContainer().Hash
     if last_tx == current_tx:
@@ -85,7 +83,6 @@ def perform_exchange(ctx):
 
     if not exchange_ok:
         print("You cannot exchange! Contact Nodis for refunds!")
-        #V7
         if attachments[2] > 0:
             OnRefund(attachments[1], attachments[2], 'neo')
         if attachments[3] > 0:
@@ -111,7 +108,6 @@ def perform_exchange(ctx):
 
     return True
 
-#V21
 def can_exchange(ctx, attachments):
     """
     Determines if the contract invocation meets all requirements for the ICO exchange
@@ -125,7 +121,6 @@ def can_exchange(ctx, attachments):
     :return:
         bool: Whether an invocation meets requirements for exchange
     """
-    #V7
     if attachments[2] > 0:
         print("NEO not accepted!")
         return False
@@ -138,7 +133,7 @@ def can_exchange(ctx, attachments):
     # the following looks up whether an address has been
     # registered with the contract for KYC regulations
     # this is not required for operation of the contract
-    #V4, V8
+
     if not valid_address(attachments[1]):
         return False
 
@@ -165,7 +160,7 @@ def get_kyc_status(ctx, address):
     :return:
         bool: KYC Status of address
     """
-    # V8
+
     if not valid_address(address):
         return False
 
@@ -173,7 +168,6 @@ def get_kyc_status(ctx, address):
 
     return Get(ctx, kyc_storage_key)
 
-#V21
 def calculate_can_exchange(ctx, amount):
     """
     Perform custom token exchange calculations here.

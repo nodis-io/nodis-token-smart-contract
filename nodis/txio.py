@@ -23,11 +23,17 @@ def get_asset_attachments():
     sender_addr = None
     sent_amount_neo = 0
     sent_amount_gas = 0
+    sent_from_contract_address = False
 
     if len(references) > 0:
 
         reference = references[0]
         sender_addr = reference.ScriptHash
+
+        for input in references:
+            if input.ScriptHash == receiver_addr:
+                sent_from_contract_address = True
+
         for output in tx.Outputs:
             if output.ScriptHash == receiver_addr:
                 if output.AssetId == neo_asset_id:
@@ -35,4 +41,4 @@ def get_asset_attachments():
                 if output.AssetId == gas_asset_id:
                     sent_amount_gas += output.Value
 
-    return [receiver_addr, sender_addr, sent_amount_neo, sent_amount_gas]
+    return [receiver_addr, sender_addr, sent_amount_neo, sent_amount_gas, sent_from_contract_address]

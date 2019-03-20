@@ -1,14 +1,16 @@
 from boa.interop.Neo.Runtime import CheckWitness, Notify
 from boa.interop.Neo.Action import RegisterAction
+from boa.interop.Neo.Blockchain import GetContract
+from boa.interop.Neo.Contract import *
 from boa.interop.Neo.Storage import *
 from boa.builtins import concat
 
 from nodis.token import *
+from utils import valid_address
 
 
 OnTransfer = RegisterAction('transfer', 'addr_from', 'addr_to', 'amount')
 OnApprove = RegisterAction('approve', 'addr_from', 'addr_to', 'amount')
-
 
 def handle_nep51(ctx, operation, args):
 
@@ -26,6 +28,8 @@ def handle_nep51(ctx, operation, args):
 
     elif operation == 'balanceOf':
         if len(args) == 1:
+            if not valid_address(args[0]):
+                return False
             return Get(ctx, args[0])
 
     elif operation == 'transfer':
@@ -46,13 +50,25 @@ def handle_nep51(ctx, operation, args):
 
     return False
 
+def is_payable(scriptHash):
+    contract = GetContract(scriptHash)
+    if not contract:
+        return True
+    else:
+        return GetIsPayable(contract)    
 
 def do_transfer(ctx, t_from, t_to, amount):
 
     if amount <= 0:
         return False
 
-    if len(t_to) != 20:
+    if not valid_address(t_from):
+        return False
+
+    if not valid_address(t_to):
+        return False
+
+    if not is_payable(t_to):
         return False
 
     if t_from == CHALLENGE_SYSTEM_RESERVE:
@@ -63,15 +79,15 @@ def do_transfer(ctx, t_from, t_to, amount):
 
     if CheckWitness(t_from):
 
-        if t_from == t_to:
-            print("transfer to self!")
-            return True
-
         from_val = Get(ctx, t_from)
 
         if from_val < amount:
             print("insufficient funds")
             return False
+
+        if t_from == t_to:
+            print("transfer to self!")
+            return True
 
         if from_val == amount:
             Delete(ctx, t_from)
@@ -98,6 +114,15 @@ def do_transfer(ctx, t_from, t_to, amount):
 def do_transfer_from(ctx, t_from, t_to, amount):
 
     if amount <= 0:
+        return False
+
+    if not valid_address(t_from):
+        return False
+
+    if not valid_address(t_to):
+        return False
+
+    if not is_payable(t_to):
         return False
 
     available_key = concat(t_from, t_to)
@@ -144,6 +169,12 @@ def do_transfer_from(ctx, t_from, t_to, amount):
 
 def do_approve(ctx, t_owner, t_spender, amount):
 
+    if not valid_address(t_owner):
+        return False
+
+    if not valid_address(t_spender):
+        return False
+
     if not CheckWitness(t_owner):
         return False
 
@@ -169,5 +200,12 @@ def do_approve(ctx, t_owner, t_spender, amount):
 
 
 def do_allowance(ctx, t_owner, t_spender):
+
+    if not valid_address(t_owner):
+        return False
+
+    if not valid_address(t_spender):
+        return False
+
 
     return Get(ctx, concat(t_owner, t_spender))

@@ -4,15 +4,13 @@ Basic settings for an NEP5 Token and crowdsale
 
 from boa.interop.Neo.Storage import *
 from boa.interop.Neo.Runtime import CheckWitness, Notify, Log
+from boa.interop.Neo.Storage import *
 
 TOKEN_NAME = 'Nodis Token'
 
 TOKEN_SYMBOL = 'NODIS'
 
 TOKEN_DECIMALS = 8
-
-# This is the script hash of the address for the owner of the token
-TOKEN_OWNER = b'\x9e\x9a\\\xfd\xb5\x18\xb83\x89e\xf4\x94\xb2\x15u\x0eh\xc2,\xa7'
 
 # Address of the challenge reserve
 CHALLENGE_SYSTEM_RESERVE = b'CHALLENGE_SYSTEM_RESERVE'
@@ -30,18 +28,35 @@ INITIAL_MINING_RATE = 50 * 100000000 # Initial mining rate upon deployment.
 # Token Gas conversion rate for Series A
 TOKENS_PER_GAS_SERIES_A = 905000000
 
-# Series A Token Sale Start Date (Sat, 06 Apr 2019 00:00 AM = 5AM GMT)
-# SERIES_A_START = 1554526800
-SERIES_A_START = 1551398400
+# Series A Token Sale Start Date (Sat, 05 Apr 2019 00:00 AM = 5AM GMT)
+SERIES_A_START = 1554422400
 
 # Series A Token Sale End Date (Thu, 06 Jun 2019 00:00 AM)
-# SERIES_A_END = 1559797200
-SERIES_A_END = 1554854400
+SERIES_A_END = 1559797200
 
 KYC_KEY = b'kyc_ok'
 
 SERIES_A_KEY = b'r1'
     
+def get_owner_address(ctx):
+    """
+    Get the current owner address.
+
+    :return: 
+        bytearray: The current owner address.
+    """
+    address = Get(ctx, b'OWNER')
+    return address
+
+def set_owner_address(ctx, new_address):
+    """
+    Set the current owner address.
+
+    :return: 
+        bytearray: The current owner address.
+    """
+    Put(ctx, b'OWNER', new_address)
+    return True
 
 def crowdsale_available_amount(ctx):
     """
@@ -92,7 +107,6 @@ def get_mining_rate(ctx):
     :return:
         int: Current mining rate
     """
-    # Needs to be tested more thoroughly especially when the supply increases.
 
     current_reserve = Get(ctx, CHALLENGE_SYSTEM_RESERVE)
 
@@ -116,9 +130,7 @@ def get_promoter_mining_rate(ctx):
     """
 
     mining_rate = get_mining_rate(ctx)
-
-    rate = mining_rate / 10
-
+    rate = mining_rate / 100
     return rate * 80
 
 

@@ -30,13 +30,9 @@ def get_asset_attachments():
         reference = references[0]
         sender_addr = reference.ScriptHash
 
-        #V1
         for input in references:
             if input.ScriptHash == receiver_addr:
                 sent_from_contract_address = True
-            else:
-                if not sender_addr:
-                    sender_addr = input.ScriptHash
 
         for output in tx.Outputs:
             if output.ScriptHash == receiver_addr:

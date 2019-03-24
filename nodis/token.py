@@ -130,7 +130,9 @@ def get_promoter_mining_rate(ctx):
     """
 
     mining_rate = get_mining_rate(ctx)
+
     rate = mining_rate / 100
+    
     return rate * 80
 
 

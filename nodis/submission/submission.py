@@ -54,7 +54,7 @@ def approve(ctx, voter, challenger, owner, challenge_id):
     Log("Generating submission key.")
     submission = get_submission(ctx, submission_key)
     if submission:
-        if GetTime() < submission['timestamp'] + 1200:
+        if GetTime() < submission['timestamp'] + 87000:
             voters = submission['voters']
             voted = contains(voters, voter)
             Log("Checking that the user has not already voted for this submission.")
@@ -91,7 +91,7 @@ def reject(ctx, voter, challenger, owner, challenge_id):
     Log("Generating submission key.")
     submission = get_submission(ctx, submission_key)
     if submission:
-        if GetTime() < submission['timestamp'] + 1200:
+        if GetTime() < submission['timestamp'] + 87000:
             voters = submission['voters']
             voted = contains(voters, voter)
             Log("Checking that the user has not already voted for this submission.")
@@ -129,7 +129,7 @@ def promoter_fund_claim(ctx, challenger, owner, challenge_id):
     Log("Generating submission key.")
     submission = get_submission(ctx, submission_key)
     if submission:
-        if GetTime() >= submission['timestamp'] + 1200:
+        if GetTime() >= submission['timestamp'] + 87000:
             Log("Submission is closed.")
             submission['state'] = 'CLOSED'
             if submission['status'] == 'APPROVED':
@@ -157,7 +157,7 @@ def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
     Log("Generating submission key.")
     submission = get_submission(ctx, submission_key)
     if submission:
-        if GetTime() >= submission['timestamp'] + 1200:
+        if GetTime() >= submission['timestamp'] + 87000:
             Log("Submission is closed.")
             rejecters = submission['rejecters']
             rejecter = contains(rejecters, voter)
@@ -188,7 +188,7 @@ def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
     Log("Generating submission key.")
     submission = get_submission(ctx, submission_key)
     if submission:
-        if GetTime() >= submission['timestamp'] + 1200:
+        if GetTime() >= submission['timestamp'] + 87000:
             Log("Submission is closed.")
             approvers = submission['approvers']
             approver = contains(approvers, voter)
@@ -232,5 +232,5 @@ def submission_expiry_date(ctx, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     submission = get_submission(ctx, submission_key)
     if submission:
-        return submission['timestamp'] + 86400
+        return submission['timestamp'] + 87000
     return False

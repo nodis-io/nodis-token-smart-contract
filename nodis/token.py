@@ -112,9 +112,7 @@ def get_mining_rate(ctx):
 
     if current_reserve != 0:
 
-        current_inverse_rate = CHALLENGE_SYSTEM_INITIAL_AMOUNT / current_reserve
-
-        return INITIAL_MINING_RATE / current_inverse_rate
+        return current_reserve / 1000000
 
     else:
 
@@ -130,7 +128,9 @@ def get_promoter_mining_rate(ctx):
     """
 
     mining_rate = get_mining_rate(ctx)
+
     rate = mining_rate / 100
+
     return rate * 80
 
 

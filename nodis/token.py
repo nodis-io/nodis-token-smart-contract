@@ -29,10 +29,10 @@ INITIAL_MINING_RATE = 50 * 100000000 # Initial mining rate upon deployment.
 TOKENS_PER_GAS_SERIES_A = 905000000
 
 # Series A Token Sale Start Date (Sat, 05 Apr 2019 00:00 AM = 5AM GMT)
-SERIES_A_START = 1554422400
+SERIES_A_START = 1553731200
 
 # Series A Token Sale End Date (Thu, 06 Jun 2019 00:00 AM)
-SERIES_A_END = 1559797200
+SERIES_A_END = 1554422400
 
 KYC_KEY = b'kyc_ok'
 

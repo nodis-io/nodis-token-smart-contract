@@ -35,7 +35,7 @@ def create_submission(ctx, challenger, owner, challenge_id):
         'approver_count': 0,
         'rejecters': [],
         'rejecter_count': 0,
-        'status': 'SUBMITTED',
+        'status': 'APPROVED',
         'state': 'CLOSED',
         'timestamp': GetTime(),
         'claimed': 'NO'
@@ -232,5 +232,5 @@ def submission_expiry_date(ctx, challenger, owner, challenge_id):
     submission_key = generate_submission_key(challenger, owner, challenge_id)
     submission = get_submission(ctx, submission_key)
     if submission:
-        return submission['timestamp'] + 86400
+        return submission['timestamp'] + 87000
     return False

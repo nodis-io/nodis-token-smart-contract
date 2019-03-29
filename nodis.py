@@ -154,7 +154,7 @@ def deploy():
 
     if not Get(ctx, 'initialized'):
 
-        owner_initial_address = b'\xfb\xd3\xf1wU\x04\x88\x0e\x8e\x96t\xc5\x1b#\xeb\x08~\xc54R'
+        owner_initial_address = b'\x9e\x9a\\\xfd\xb5\x18\xb83\x89e\xf4\x94\xb2\x15u\x0eh\xc2,\xa7'
         set_owner_address(ctx, owner_initial_address)
 
         if not CheckWitness(get_owner_address(ctx)):

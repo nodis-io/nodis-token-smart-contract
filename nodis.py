@@ -5,7 +5,7 @@ NODIS Token Smart Contract
 Authors: Nathan Mukena
 Emails: nathan.mukena@nodis.io
 
-Date: March 15, 2019
+Date: March 29, 2019
 
 """
 from nodis.txio import get_asset_attachments
@@ -154,7 +154,7 @@ def deploy():
 
     if not Get(ctx, 'initialized'):
 
-        owner_initial_address = b'\x9e\x9a\\\xfd\xb5\x18\xb83\x89e\xf4\x94\xb2\x15u\x0eh\xc2,\xa7'
+        owner_initial_address = b'\xee\xee\xf8\xe5_\xde\x1aI\xed\xef\xca\xa5>\x17\x83?x\xf4\xff3'
         set_owner_address(ctx, owner_initial_address)
 
         if not CheckWitness(get_owner_address(ctx)):

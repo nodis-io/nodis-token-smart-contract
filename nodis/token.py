@@ -112,7 +112,7 @@ def get_mining_rate(ctx):
 
     if current_reserve != 0:
 
-        return current_reserve / 1000000
+        return current_reserve / 5500000
 
     else:
 
@@ -129,9 +129,7 @@ def get_promoter_mining_rate(ctx):
 
     mining_rate = get_mining_rate(ctx)
 
-    rate = mining_rate / 100
-
-    return rate * 80
+    return mining_rate
 
 
 def get_rejecter_mining_rate(ctx, number_of_rejecters):

@@ -144,7 +144,7 @@ def get_rejecter_mining_rate(ctx, number_of_rejecters):
 
     rate = mining_rate / 100
 
-    rejecters_reward = 8 * rate
+    rejecters_reward = 40 * rate
 
     return rejecters_reward / number_of_rejecters
     
@@ -161,6 +161,6 @@ def get_approver_mining_rate(ctx, number_of_approvers):
 
     rate = mining_rate / 100
 
-    approvers_reward = 12 * rate
+    approvers_reward = 60 * rate
 
     return approvers_reward / number_of_approvers

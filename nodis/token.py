@@ -31,8 +31,8 @@ TOKENS_PER_GAS_SERIES_A = 905000000
 # Series A Token Sale Start Date (Sat, 05 Apr 2019 00:00 AM = 5AM GMT)
 SERIES_A_START = 1554422400
 
-# Series A Token Sale End Date (Thu, 07 July 2019 00:00 AM)
-SERIES_A_END = 1562457600
+# Series A Token Sale End Date (Wed, 30 Sep 2020 00:00:00 AM = 5AM GMT)
+SERIES_A_END = 1601424000
 
 KYC_KEY = b'kyc_ok'
 

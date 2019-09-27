@@ -1,98 +1,102 @@
 <p align="center">
   <img
-    src="http://neonexchange.org/img/NEX-logo.svg"
+    src="https://nodis.io/static/media/nodis-logo.abf6b121.png"
     width="125px;">
     
 </p>
-<h3 align="center">Neo ICO Template</h3>
-<p align="center">A template for NEP5 Compliant Tokens on the NEO platform</p>
+<h3 align="center">Nodis Smart Contract</h3>
+<p align="center">The official Python NODIS Smart Contract.</p>
 <hr/>
 
-#### Considerations
+# Description
 
-An article describing this template is available here:
+This contract has been designed and developed by the NODIS team. It will serve during the token sales and throughout the entire duration of the NODIS project.
 
-https://medium.com/neon-exchange/nex-ico-template-4ca7ba19fc8b
+# Commands
 
-#### Requirements
+## Token Sale / ICO
 
-Usage requires Python 3.6+
+`sc invoke <contract address> crowdsale_status ["<wallet address>"]` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
+`sc invoke <contract hash> mintTokens [] --attach-gas={number}` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-#### Installation
+## Transferring NODIS tokens
 
-Clone the repository and navigate into the project directory. 
-Make a Python 3 virtual environment and activate it via
+`sc invoke <contract address> transfer ["<owner address>", "<destination address>", 500]` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-```shell
-python3 -m venv venv
-source venv/bin/activate
-```
+## Mining Rate
 
-or to explicitly install Python 3.6 via
+`sc invoke <contract hash> get_mining_rate []` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-    virtualenv -p /usr/local/bin/python3.6 venv
-    source venv/bin/activate
+`sc invoke <contract hash> get_promoter_mining_rate []` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-Then install the requirements via
+`sc invoke <contract hash> get_approver_mining_rate [1]` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-```shell
-pip install -r requirements.txt
-```
-
-#### Compilation
-
-The template may be compiled as follows
-
-```python
-from boa.compiler import Compiler
-
-Compiler.load_and_save('ico_template.py')
-```
+`sc invoke <contract hash> get_rejecter_mining_rate [1]` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
 
-This will compile your template to `ico_template.avm`
+## Challenge System 
+
+`sc invoke <contract address> register_business ["<business address>"]` <span style="color:BlueViolet;border-color:BlueViolet;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">ADMIN</span>
+
+`sc invoke <contract address> signout_business ["<business address>"]` <span style="color:BlueViolet;border-color:BlueViolet;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">ADMIN</span>
+
+`sc invoke <contract address> create_challenge ["<Alice's address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span> <span style="color:DarkSlateGrey;border-color:DarkSlateGrey;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">BUSINESS</span>
+
+`sc invoke <contract address> submit ["<Bob's address>", "<Alice's address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
+
+`sc invoke <contract address> approve_submission ["<David's address>", "<Bob's address>", "<Alice's address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
+
+`sc invoke <contract address> reject_submission ["<Francis' address>", "<Bob's address>", "<Alice's address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
+
+`sc invoke <contract address> close_challenge ["<Alice's address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span> <span style="color:DarkSlateGrey;border-color:DarkSlateGrey;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">BUSINESS</span>
 
 
+## Challenge Package
 
-#### Running tests
+`sc invoke <contract hash> buy_challenge_package ["<alice_address>", 2]` <span style="color:BlueViolet;border-color:BlueViolet;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">ADMIN</span> <span style="color:DarkSlateGrey;border-color:DarkSlateGrey;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">BUSINESS</span>
 
-1. Install `requirements_test.txt`
+`sc invoke <contract hash> check_challenge_package ["<alice_address>"]` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-``` 
-pip install -r requirements_test.txt
 
-```
+## Claims 
+`sc invoke <contract hash> promoter_claim ["<bob_address>", "<alice_address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-2. Run tests
+`sc invoke <contract hash> approver_claim ["<david_address>", "<bob_address>", "<alice_address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-``` 
-python -m unittest discover tests
-```
 
-#### Testnet Deployed Details
+`sc invoke <contract hash> rejecter_claim ["<francis_address>", "<clyde_address>", "<alice_address>", 'challenge-number-1']` <span style="color:green;border-color:green;border-style:solid;border-width:1px;border-radius:25px;font-size:10px;">PUBLIC</span>
 
-For testing purposes, this template is deployed on testnet with the following contract script hash:
 
-`0b6c1f919e95fe61c17a7612aebfaf4fda3a2214`
+##NODIS _GET_ Functions
 
-```json
-{
-    "code": {
-        "parameters": "0710",
-        "hash": "0b6c1f919e95fe61c17a7612aebfaf4fda3a2214",
-        "returntype": 5,
-        "script": ".. omitted .."
-    },
-    "version": 0,
-    "code_version": ".2",
-    "name": "NEX Ico Template",
-    "author": "localhuman",
-    "description": "An ICO Template",
-    "properties": {
-        "dynamic_invoke": false,
-        "storage": true
-    },
-    "email": "tom@neonexchange.org"
-}
-```
+### Challenge Getter
+
+`sc invoke <smart contract> is_challenge_open ["<alice_address>", 'challenge-number-1']`
+`sc invoke <smart contract> is_challenge_closed ["<alice_address>", 'challenge-number-1']`
+`sc invoke <smart contract> submission_number ["<alice_address>", 'challenge-number-1']`
+`sc invoke <smart contract> challenge_expiry_date ["<alice_address>", 'challenge-number-1']`
+
+### Submission Getter
+
+`sc invoke <smart contract> submission_approver_number ["<bob_address>", "<alice_address>", 'challenge-number-1']`
+`sc invoke <smart contract> submission_rejecter_number ["<bob_address>", "<alice_address>", 'challenge-number-1']`
+`sc invoke <smart contract> submission_expiry_date ["<bob_address>", "<alice_address>", 'challenge-number-1']`
+
+### Challenge Reserve Getter
+
+`sc invoke <smart contract> challenge_reserve []`
+
+### Challenge Reserve Loader
+
+`sc invoke <smart contract> load_challenge_reserve [900000000]`
+
+# Audit
+
+This contract was audited by **Red4Sec CyberSecurity S.L**.
+<p align="center">
+  <img
+    src="https://red4sec.com/images/logo.png"
+    width="125px;">
+</p>
+<p><a href="https://red4sec.com/en">See Website</a>.</p> 

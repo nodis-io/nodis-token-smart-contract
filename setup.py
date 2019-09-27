@@ -14,22 +14,22 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 
 setup(
-    name='neo-ico-template',
+    name='nodis-smart-contract',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
     version='0.2.0',
 
-    description='A Python Template for an NEP5 Token',
+    description='Nodis Smart Contract',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/neonexchange/neo-ico-template',
+    url='https://nodis.io/',
 
-    # Author details
-    author='Thomas Saunders',
-    author_email='tom@neonexchange.org',
+    # Authors details
+    author='Nathan Mukena',
+    author_email='nathan.mukena@nodis.io',
 
     # Choose your license
     license='GPL3',
@@ -56,7 +56,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='NEP5 ICO Token NEO .avm blockchain development dApp',
+    keywords='NODIS Smart Contract Token Sale Challenge Submission',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
@@ -73,7 +73,7 @@ setup(
     install_requires=['neo-boa',],
 
 
-    python_requires='>=3.4, <3.6',
+    python_requires='>=3.4, <3.8',
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

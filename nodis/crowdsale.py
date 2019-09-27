@@ -2,17 +2,20 @@ from boa.interop.Neo.Blockchain import GetHeight
 from boa.interop.Neo.Header import GetTimestamp
 from boa.interop.Neo.Runtime import CheckWitness, GetTime
 from boa.interop.Neo.Action import RegisterAction
+from boa.interop.System.ExecutionEngine import GetScriptContainer
 from boa.interop.Neo.Storage import Get, Put
 from boa.builtins import concat
 from nodis.token import *
 from nodis.txio import get_asset_attachments
+from utils import valid_address
 
-# OnInvalidKYCAddress = RegisterAction('invalid_registration', 'address')
 OnKYCRegister = RegisterAction('kyc_registration', 'address')
 OnTransfer = RegisterAction('transfer', 'addr_from', 'addr_to', 'amount')
-OnRefund = RegisterAction('refund', 'addr_to', 'amount')
+OnRefund = RegisterAction('refund', 'addr_to', 'amount', 'asset')
 
 time = GetTime()
+
+LAST_TX_KEY = b'LAST_TX_KEY'
 
 def kyc_register(ctx, args):
     """
@@ -24,7 +27,7 @@ def kyc_register(ctx, args):
     """
     ok_count = 0
 
-    if CheckWitness(TOKEN_OWNER):
+    if CheckWitness(get_owner_address(ctx)):
 
         for address in args:
 
@@ -50,7 +53,8 @@ def kyc_status(ctx, args):
 
     if len(args) > 0:
         addr = args[0]
-
+        if not valid_address(addr):
+            return False
         kyc_storage_key = concat(KYC_KEY, addr)
 
         return Get(ctx, kyc_storage_key)
@@ -66,15 +70,23 @@ def perform_exchange(ctx):
          bool: Whether the exchange was successful
      """
 
+    last_tx = Get(ctx, LAST_TX_KEY)
+    current_tx = GetScriptContainer().Hash
+    if last_tx == current_tx:
+        return False
+    Put(ctx, LAST_TX_KEY, current_tx)
+
     attachments = get_asset_attachments()  # [receiver, sender, neo, gas]
 
     # this looks up whether the exchange can proceed
-    exchange_ok = can_exchange(ctx, attachments, False)
+    exchange_ok = can_exchange(ctx, attachments)
 
     if not exchange_ok:
         print("You cannot exchange! Contact Nodis for refunds!")
+        if attachments[2] > 0:
+            OnRefund(attachments[1], attachments[2], 'neo')
         if attachments[3] > 0:
-            OnRefund(attachments[1], attachments[3])
+            OnRefund(attachments[1], attachments[3], 'gas')
         return False
 
     print("We will proceed with the exchange of tokens now.")
@@ -96,8 +108,7 @@ def perform_exchange(ctx):
 
     return True
 
-
-def can_exchange(ctx, attachments, verify_only):
+def can_exchange(ctx, attachments):
     """
     Determines if the contract invocation meets all requirements for the ICO exchange
     of neo or gas into NEP5 Tokens.
@@ -110,6 +121,9 @@ def can_exchange(ctx, attachments, verify_only):
     :return:
         bool: Whether an invocation meets requirements for exchange
     """
+    if attachments[2] > 0:
+        print("NEO not accepted!")
+        return False
 
     # If you have less than 50 GAS, the minting will be refused.
     if attachments[3] < 50 * 100000000:
@@ -120,6 +134,9 @@ def can_exchange(ctx, attachments, verify_only):
     # registered with the contract for KYC regulations
     # this is not required for operation of the contract
 
+    if not valid_address(attachments[1]):
+        return False
+
     if not get_kyc_status(ctx, attachments[1]):
         print("You have not been registered for the Token sale.")
         return False
@@ -129,7 +146,7 @@ def can_exchange(ctx, attachments, verify_only):
     # calculate the amount requested
     amount_requested = attachments[3] * TOKENS_PER_GAS_SERIES_A / 100000000
 
-    exchange_ok = calculate_can_exchange(ctx, amount_requested, attachments[1], verify_only)
+    exchange_ok = calculate_can_exchange(ctx, amount_requested)
 
     return exchange_ok
 
@@ -143,17 +160,19 @@ def get_kyc_status(ctx, address):
     :return:
         bool: KYC Status of address
     """
+
+    if not valid_address(address):
+        return False
+
     kyc_storage_key = concat(KYC_KEY, address)
 
     return Get(ctx, kyc_storage_key)
 
-
-def calculate_can_exchange(ctx, amount, address, verify_only):
+def calculate_can_exchange(ctx, amount):
     """
     Perform custom token exchange calculations here.
 
     :param amount:int Number of tokens to convert from asset to tokens
-    :param address:bytearray The address to mint the tokens to
     :return:
         bool: Whether or not an address can exchange a specified amount
     """

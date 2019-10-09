@@ -106,11 +106,6 @@ def submit(ctx, challenge_key, submission_key):
             if contains(submissions, submission_key):
                 Log("Submission already exists.")
                 return False
-            elif GetTime() > challenge['timestamp'] + 1209600:
-                Log("This challenge has expired.")
-                challenge['state'] = 'CLOSED'
-                set_challenge(ctx, challenge_key, challenge)
-                return False
             else:
                 Log("Adding new submission.")
                 submissions.append(submission_key)

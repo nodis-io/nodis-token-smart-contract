@@ -31,8 +31,8 @@ TOKENS_PER_GAS_SERIES_A = 905000000
 # Series A Token Sale Start Date (Sat, 05 Apr 2019 00:00 AM = 5AM GMT)
 SERIES_A_START = 1554422400
 
-# Series A Token Sale End Date (Thu, 07 July 2019 00:00 AM)
-SERIES_A_END = 1562457600
+# Series A Token Sale End Date (Wed, 30 Sep 2020 00:00:00 AM = 5AM GMT)
+SERIES_A_END = 1601424000
 
 KYC_KEY = b'kyc_ok'
 
@@ -112,7 +112,7 @@ def get_mining_rate(ctx):
 
     if current_reserve != 0:
 
-        return current_reserve / 1000000
+        return current_reserve / 5500000
 
     else:
 
@@ -129,9 +129,7 @@ def get_promoter_mining_rate(ctx):
 
     mining_rate = get_mining_rate(ctx)
 
-    rate = mining_rate / 100
-
-    return rate * 80
+    return mining_rate
 
 
 def get_rejecter_mining_rate(ctx, number_of_rejecters):
@@ -146,7 +144,7 @@ def get_rejecter_mining_rate(ctx, number_of_rejecters):
 
     rate = mining_rate / 100
 
-    rejecters_reward = 8 * rate
+    rejecters_reward = 40 * rate
 
     return rejecters_reward / number_of_rejecters
     
@@ -163,6 +161,6 @@ def get_approver_mining_rate(ctx, number_of_approvers):
 
     rate = mining_rate / 100
 
-    approvers_reward = 12 * rate
+    approvers_reward = 60 * rate
 
     return approvers_reward / number_of_approvers

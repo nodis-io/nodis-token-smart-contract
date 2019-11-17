@@ -161,7 +161,7 @@ def rejecter_fund_claim(ctx, voter, challenger, owner, challenge_id):
             Log("Submission is closed.")
             rejecters = submission['rejecters']
             rejecter = contains(rejecters, voter)
-            if rejecter != False:
+            if rejecter:
                 Log("Voter rejected the submission.") 
                 if submission['status'] == 'REJECTED':
                     Log("Submission was rejected. Voter is eligible for claim.")
@@ -192,7 +192,7 @@ def approver_fund_claim(ctx, voter, challenger, owner, challenge_id):
             Log("Submission is closed.")
             approvers = submission['approvers']
             approver = contains(approvers, voter)
-            if approver != False:
+            if approver:
                 Log("Voter approved the submission.")  
                 if submission['status'] == 'APPROVED':
                     Log("Submission was approved. Voter is eligible for claim.")

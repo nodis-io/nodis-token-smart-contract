@@ -53,7 +53,7 @@ def kyc_status(ctx, args):
 
     if len(args) > 0:
         addr = args[0]
-        if not valid_address(addr):
+        if len(addr) != 20:
             return False
         kyc_storage_key = concat(KYC_KEY, addr)
 

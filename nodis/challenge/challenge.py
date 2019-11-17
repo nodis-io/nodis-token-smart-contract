@@ -60,7 +60,7 @@ def create_challenge(ctx, owner, challenge_id):
     last_challenge_date = last_challenge_timestamp(ctx, owner)
     challenge_package = check_challenge_package(ctx, owner)
     using_package = False
-    can_create_challenge = False
+    can_create_challenge = True
 
     if GetTime() > last_challenge_date + 2592000:
         can_create_challenge = True
@@ -99,28 +99,21 @@ def create_challenge(ctx, owner, challenge_id):
 def submit(ctx, challenge_key, submission_key):
     challenge = get_challenge(ctx, challenge_key)
     if challenge:
+        Log("Challenge exists.")
         if challenge['state'] == 'OPEN':
+            Log("Challenge is open")
             submissions = challenge['submissions']
             if contains(submissions, submission_key):
                 Log("Submission already exists.")
                 return False
-            elif len(submissions)<100:
+            else:
                 Log("Adding new submission.")
                 submissions.append(submission_key)
                 challenge['submissions'] = submissions
                 set_challenge(ctx, challenge_key, challenge)
                 return True
-            elif GetTime() > challenge['timestamp'] + 1209600:
-                Log("This challenge has expired.")
-                challenge['state'] = 'CLOSED'
-                set_challenge(ctx, challenge_key, challenge)
-                return False
-            else:
-                Log("The maximum number of submissions for this challenge has been reached.")
-                challenge['state'] = 'CLOSED'
-                set_challenge(ctx, challenge_key, challenge)
-                return False
         else:
+            Log("Challenge is closed")
             return False
     Log("This challenge does not exist.")
     return False
